@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Excel Parser Auto</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #fafafa; }
+        pre { background: #eee; padding: 15px; border-radius: 5px; overflow-x: auto; max-height: 500px; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Excel Parser - Auto Fetch</h1>
+    <div id="status">Fetching file...</div>
+    <h2>Parsed Output:</h2>
+    <pre id="output">Loading and parsing...</pre>
+
+    <script>
+        (async function() {
+            try {
+                const response = await fetch('/TW-SB-938-1PC_TAI0226-SAME.xlsm');
+                if (!response.ok) {
+                    throw new Error("HTTP error: " + response.status);
+                }
+                const data = await response.arrayBuffer();
+                const workbook = XLSX.read(new Uint8Array(data), { type: 'array' });
+                
+                document.getElementById('status').className = 'success';
+                document.getElementById('status').innerText = 'Successfully parsed sheets: ' + workbook.SheetNames.join(', ');
+                
+                const result = {};
+                workbook.SheetNames.forEach(sheetName => {
+                    const worksheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                    result[sheetName] = rows;
+                });
+                
+                document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+                console.log("AUTO_PARSE_COMPLETE", result);
+            } catch (err) {
+                document.getElementById('status').className = 'error';
+                document.getElementById('status').innerText = 'Error: ' + err.message;
+                document.getElementById('output').textContent = err.stack || err;
+                console.error(err);
+            }
+        })();
+    </script>
+</body>
+</html>

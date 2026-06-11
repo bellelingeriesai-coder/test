@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collections | Tweens – Bonded Bra Pioneers</title>
+    <meta name="description"
+        content="Explore the premium collections of bonded bras, comfort-first wireless bras, and seamless panties from Tweens global. Fine intimatewear crafted for everyday luxury.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png"
+        href="https://cdn.shopify.com/s/files/1/0840/3045/6115/files/Tweens_Global_Icon_3584676c-ce83-4d31-8aa0-040ca51cfc5e.png?v=1779365489">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="preloader-inner">
+            <img src="https://cdn.shopify.com/s/files/1/0840/3045/6115/files/WhatsApp_Image_2026-05-21_at_5.00.16_PM.jpg?v=1779363068"
+                alt="Tweens Logo" class="preloader-logo">
+            <div class="preloader-bar">
+                <div class="preloader-fill"></div>
+            </div>
+            <p class="preloader-tagline">Comfort. Crafted for You.</p>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header id="header" class="scrolled">
+        <div class="announcement-bar">
+            <div class="container announcement-inner">
+                <div class="announcement-content">
+                    <a href="#" class="announcement-link"><i class="fas fa-file-pdf"></i> Catalogue</a>
+                    <span class="announcement-sep">|</span>
+                    <div class="announcement-marquee">
+                        <div class="announcement-marquee-track">
+                            <span>Exclusive Bonded Bra Pioneers &bull; Comfortable Seamless Confidence &bull; Worldwide Export & Private Labeling Available &bull; </span>
+                            <span>Exclusive Bonded Bra Pioneers &bull; Comfortable Seamless Confidence &bull; Worldwide Export & Private Labeling Available &bull; </span>
+                            <span>Exclusive Bonded Bra Pioneers &bull; Comfortable Seamless Confidence &bull; Worldwide Export & Private Labeling Available &bull; </span>
+                            <span>Exclusive Bonded Bra Pioneers &bull; Comfortable Seamless Confidence &bull; Worldwide Export & Private Labeling Available &bull; </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container navbar">
+            <a href="index.html" class="logo-link">
+                <img src="https://cdn.shopify.com/s/files/1/0840/3045/6115/files/Tweens.png?v=1760613049"
+                    alt="Tweens Logo" class="nav-logo">
+            </a>
+            <nav>
+                <ul class="nav-links" id="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="about.html" class="nav-link">About Us</a></li>
+                    <li class="has-dropdown">
+                        <a href="collections.html" class="nav-link active">Products <i class="fas fa-chevron-down nav-arrow"></i></a>
+                        <ul class="dropdown">
+                            <li><a href="collections.html?category=bras" class="dropdown-link">Bras</a></li>
+                            <li><a href="collections.html?category=bonded-bras" class="dropdown-link">Bonded Bras</a></li>
+                            <li><a href="collections.html?category=panties" class="dropdown-link">Panties</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="founders-desk.html" class="nav-link">Founder's Desk</a></li>
+                    <li class="has-dropdown">
+                        <a href="#" class="nav-link">More <i class="fas fa-chevron-down nav-arrow"></i></a>
+                        <ul class="dropdown">
+                            <li><a href="faq.html" class="dropdown-link">FAQs</a></li>
+                            <li><a href="shipping-policy.html" class="dropdown-link">Shipping Policy</a></li>
+                            <li><a href="privacy-policy.html" class="dropdown-link">Privacy Policy</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="blogs.html" class="nav-link">Blogs</a></li>
+                    <li><a href="index.html#contact" class="nav-link nav-cta">Enquire Now</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- SUBPAGE HERO -->
+    <section class="subpage-hero-small">
+        <div class="container">
+            <div class="hero-content-sub" data-aos>
+                <div class="section-label" id="collection-label-tag">OUR CATALOGUE</div>
+                <h1 class="section-heading" id="collection-heading-title">Explore Collections</h1>
+            </div>
+        </div>
+    </section>
+
+    <!-- COLLECTIONS GRID SECTION -->
+    <section class="collections-container">
+        <div class="container">
+            <div class="collections-layout">
+                
+                <!-- SIDEBAR FILTERS (DESKTOP) / MODAL DRAWER (MOBILE) -->
+                <aside class="filters-sidebar" id="filters-sidebar">
+                    <div class="filters-header">
+                        <h3>Filters</h3>
+                        <button class="btn-reset-filters" id="btn-reset-filters">Clear All</button>
+                        <!-- Mobile Close Button -->
+                        <button class="btn-close-modal" id="btn-close-mobile-filters" style="display: none;" aria-label="Close filters">&times;</button>
+                    </div>
+
+                    <!-- Category Filter Group -->
+                    <div class="filter-group">
+                        <h4 class="filter-group-title">Category</h4>
+                        <div class="filter-options-list">
+                            <label class="filter-checkbox-label">
+                                <input type="checkbox" name="category" value="bras" id="chk-bras">
+                                <span class="custom-checkbox"></span>
+                                Bras
+                            </label>
+                            <label class="filter-checkbox-label">
+                                <input type="checkbox" name="category" value="bonded-bras" id="chk-bonded">
+                                <span class="custom-checkbox"></span>
+                                Bonded Bras
+                            </label>
+                            <label class="filter-checkbox-label">
+                                <input type="checkbox" name="category" value="panties" id="chk-panties">
+                                <span class="custom-checkbox"></span>
+                                Panties
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Colors Filter Group -->
+                    <div class="filter-group">
+                        <h4 class="filter-group-title">Colors</h4>
+                        <div class="color-swatches-grid" id="color-filters-container">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Sizes Filter Group -->
+                    <div class="filter-group">
+                        <h4 class="filter-group-title">Sizes</h4>
+                        <div class="size-boxes-grid" id="size-filters-container">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- PRODUCTS WRAPPER -->
+                <main class="products-content">
+                    
+                    <!-- Mobile filter action bar -->
+                    <div class="mobile-filters-trigger-bar">
+                        <button class="btn-mobile-filters" id="btn-mobile-filters-trigger">
+                            <i class="fas fa-sliders-h"></i> Filter & Sort
+                        </button>
+                    </div>
+
+                    <!-- Header bar info & sorting -->
+                    <div class="collections-header-bar">
+                        <div class="products-count" id="products-count-label">Showing all products</div>
+                        <div class="products-sorting">
+                            <select id="products-sort-select" aria-label="Sort products">
+                                <option value="default">Featured</option>
+                                <option value="az">Alphabetically, A-Z</option>
+                                <option value="za">Alphabetically, Z-A</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div class="collection-products-grid" id="collection-products-grid">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+
+                    <!-- Fallback: No Products Matched -->
+                    <div class="no-products-fallback" id="no-products-fallback" style="display: none;">
+                        <i class="fas fa-search"></i>
+                        <h3>No Products Matched</h3>
+                        <p>Try resetting or adjusting your filter combinations to find items.</p>
+                    </div>
+
+                </main>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <img src="https://cdn.shopify.com/s/files/1/0840/3045/6115/files/Tweens.png?v=1760613049" alt="Tweens"
+                    class="footer-logo">
+                <p>India's one of the largest manufacturers of Bonded Bras. Comfort decoded for Indian women.</p>
+                <div class="footer-social">
+                    <a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" target="_blank" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="blogs.html">Blogs</a></li>
+                    <li><a href="index.html#contact">Enquire Now</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Products</h4>
+                <ul>
+                    <li><a href="collections.html?category=bras">Bras</a></li>
+                    <li><a href="collections.html?category=bonded-bras">Bonded Bras</a></li>
+                    <li><a href="collections.html?category=panties">Panties</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="faq.html">FAQs</a></li>
+                    <li><a href="shipping-policy.html">Shipping Policy</a></li>
+                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact</h4>
+                <ul>
+                    <li><a href="mailto:aditya@tweens.in">aditya@tweens.in</a></li>
+                    <li><a href="mailto:manvi@bellelingeries.com">manvi@bellelingeries.com</a></li>
+                    <li>Belle Lingeries, India</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Tweens / Belle Lingeries. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- SHARED DATA -->
+    <script src="products-data.js"></script>
+    <script src="scripts.js"></script>
+
+    <!-- COLLECTIONS LOGIC -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State
+            const state = {
+                categories: [],
+                colors: [],
+                sizes: [],
+                sort: 'default'
+            };
+
+            // DOM Elements
+            const productsGrid = document.getElementById('collection-products-grid');
+            const noProductsFallback = document.getElementById('no-products-fallback');
+            const countLabel = document.getElementById('products-count-label');
+            const resetBtn = document.getElementById('btn-reset-filters');
+            const categoryCheckboxes = document.querySelectorAll('input[name="category"]');
+            const colorContainer = document.getElementById('color-filters-container');
+            const sizeContainer = document.getElementById('size-filters-container');
+            const sortSelect = document.getElementById('products-sort-select');
+            
+            // Mobile elements
+            const mobileFilterTrigger = document.getElementById('btn-mobile-filters-trigger');
+            const sidebar = document.getElementById('filters-sidebar');
+            const closeMobileFilters = document.getElementById('btn-close-mobile-filters');
+
+            // Unique filters setup
+            const setupFilterOptions = () => {
+                const uniqueColors = new Map();
+                const uniqueSizes = new Set();
+
+                PRODUCTS_DATA.forEach(p => {
+                    p.colors.forEach(c => uniqueColors.set(c.name, c.hex));
+                    p.sizes.forEach(s => uniqueSizes.add(s));
+                });
+
+                // Render color filters
+                colorContainer.innerHTML = Array.from(uniqueColors.entries()).map(([name, hex]) => `
+                    <button class="color-filter-btn" data-color-name="${name}" style="background-color: ${hex};" title="${name}" aria-label="Filter by ${name} color"></button>
+                `).join('');
+
+                // Render size filters
+                // Sort sizes: standard numeric first, then alphabetical tags (S, M, etc.)
+                const sortedSizes = Array.from(uniqueSizes).sort((a, b) => {
+                    const numA = parseInt(a, 10);
+                    const numB = parseInt(b, 10);
+                    if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                    if (!isNaN(numA)) return -1;
+                    if (!isNaN(numB)) return 1;
+                    // For sizes S, M, L, XL, XXL
+                    const order = { 'S': 1, 'M': 2, 'L': 3, 'XL': 4, 'XXL': 5 };
+                    return (order[a] || 99) - (order[b] || 99);
+                });
+
+                sizeContainer.innerHTML = sortedSizes.map(size => `
+                    <button class="size-filter-btn" data-size="${size}">${size}</button>
+                `).join('');
+
+                // Event Listeners for new buttons
+                document.querySelectorAll('.color-filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const name = btn.dataset.colorName;
+                        const index = state.colors.indexOf(name);
+                        if (index > -1) {
+                            state.colors.splice(index, 1);
+                            btn.classList.remove('active');
+                        } else {
+                            state.colors.push(name);
+                            btn.classList.add('active');
+                        }
+                        renderProducts();
+                    });
+                });
+
+                document.querySelectorAll('.size-filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const size = btn.dataset.size;
+                        const index = state.sizes.indexOf(size);
+                        if (index > -1) {
+                            state.sizes.splice(index, 1);
+                            btn.classList.remove('active');
+                        } else {
+                            state.sizes.push(size);
+                            btn.classList.add('active');
+                        }
+                        renderProducts();
+                    });
+                });
+            };
+
+            // Initialize filters from query parameter
+            const initQueryParams = () => {
+                const params = new URLSearchParams(window.location.search);
+                const categoryParam = params.get('category');
+                
+                if (categoryParam) {
+                    const chk = document.getElementById(categoryParam === 'bonded-bras' ? 'chk-bonded' : `chk-${categoryParam}`);
+                    if (chk) {
+                        chk.checked = true;
+                        state.categories.push(chk.value);
+                    }
+                    
+                    // Update Page Title and label appropriately
+                    const titleText = categoryParam === 'bras' ? "Premium Bras" : (categoryParam === 'bonded-bras' ? "Zero-Stitch Bonded Bras" : "Seamless Panties");
+                    document.getElementById('collection-heading-title').textContent = titleText;
+                    document.getElementById('collection-label-tag').textContent = categoryParam.replace('-', ' ');
+                }
+            };
+
+            // Render Products
+            const renderProducts = () => {
+                // Filter
+                let filtered = PRODUCTS_DATA.filter(p => {
+                    // Category filter
+                    if (state.categories.length > 0 && !state.categories.includes(p.category)) {
+                        return false;
+                    }
+                    // Color filter
+                    if (state.colors.length > 0) {
+                        const hasColor = p.colors.some(c => state.colors.includes(c.name));
+                        if (!hasColor) return false;
+                    }
+                    // Size filter
+                    if (state.sizes.length > 0) {
+                        const hasSize = p.sizes.some(s => state.sizes.includes(s));
+                        if (!hasSize) return false;
+                    }
+                    return true;
+                });
+
+                // Sort
+                if (state.sort === 'az') {
+                    filtered.sort((a, b) => a.name.localeCompare(b.name));
+                } else if (state.sort === 'za') {
+                    filtered.sort((a, b) => b.name.localeCompare(a.name));
+                }
+
+                // Update count
+                countLabel.textContent = `Showing ${filtered.length} product${filtered.length === 1 ? '' : 's'}`;
+
+                // Render grid
+                if (filtered.length === 0) {
+                    productsGrid.style.display = 'none';
+                    noProductsFallback.style.display = 'block';
+                } else {
+                    productsGrid.style.display = 'grid';
+                    noProductsFallback.style.display = 'none';
+
+                    productsGrid.innerHTML = filtered.map(p => {
+                        // Default to first color
+                        const defaultColor = p.colors[0];
+                        const defaultPlaceholder = defaultColor.image ? defaultColor.image : getProductPlaceholderSVG(p.category, defaultColor.hex);
+                        const categoryName = p.category.replace('-', ' ');
+                        
+                        // Swatches HTML
+                        const swatchesHtml = p.colors.map((c, i) => `
+                            <span class="card-swatch ${i === 0 ? 'active' : ''}" 
+                                  style="background-color: ${c.hex};" 
+                                  title="${c.name}"
+                                  data-hex="${c.hex}">
+                            </span>
+                        `).join('');
+
+                        return `
+                            <article class="collection-product-card" data-id="${p.id}" data-category="${p.category}">
+                                <div class="card-media-wrap">
+                                    <span class="card-category-badge">${categoryName}</span>
+                                    <img src="${defaultPlaceholder}" alt="${p.name}" class="card-placeholder-img" id="card-img-${p.id}">
+                                </div>
+                                <div class="card-info-wrap">
+                                    <h3 class="card-product-title">${p.name}</h3>
+                                    <div class="card-color-swatches" id="card-swatches-${p.id}">
+                                        ${swatchesHtml}
+                                    </div>
+                                    <div class="card-sizes-indicator">
+                                        Sizes: ${p.sizes.join(', ')}
+                                    </div>
+                                </div>
+                                <a href="product.html?id=${p.id}" class="btn-card-view">View Details</a>
+                            </article>
+                        `;
+                    }).join('');
+
+                    // Add color-swapping hover action on swatches
+                    filtered.forEach(p => {
+                        const cardElement = document.querySelector(`.collection-product-card[data-id="${p.id}"]`);
+                        const mainImg = document.getElementById(`card-img-${p.id}`);
+                        const swatches = cardElement.querySelectorAll('.card-swatch');
+
+                        swatches.forEach(swatch => {
+                            swatch.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                swatches.forEach(s => s.classList.remove('active'));
+                                swatch.classList.add('active');
+
+                                // Update image
+                                const hex = swatch.dataset.hex;
+                                const colorObj = p.colors.find(c => c.hex === hex);
+                                mainImg.src = (colorObj && colorObj.image) ? colorObj.image : getProductPlaceholderSVG(p.category, hex);
+                            });
+                        });
+                        
+                        // Card navigation
+                        cardElement.addEventListener('click', (e) => {
+                            if (!e.target.classList.contains('card-swatch')) {
+                                window.location.href = `product.html?id=${p.id}`;
+                            }
+                        });
+                    });
+                }
+            };
+
+            // Event Listeners
+            categoryCheckboxes.forEach(chk => {
+                chk.addEventListener('change', () => {
+                    state.categories = Array.from(categoryCheckboxes)
+                        .filter(c => c.checked)
+                        .map(c => c.value);
+                    
+                    // Reset header title if multiple categories checked
+                    if (state.categories.length !== 1) {
+                        document.getElementById('collection-heading-title').textContent = "Explore Collections";
+                        document.getElementById('collection-label-tag').textContent = "OUR CATALOGUE";
+                    } else {
+                        const cat = state.categories[0];
+                        const titleText = cat === 'bras' ? "Premium Bras" : (cat === 'bonded-bras' ? "Zero-Stitch Bonded Bras" : "Seamless Panties");
+                        document.getElementById('collection-heading-title').textContent = titleText;
+                        document.getElementById('collection-label-tag').textContent = cat.replace('-', ' ');
+                    }
+                    renderProducts();
+                });
+            });
+
+            sortSelect.addEventListener('change', (e) => {
+                state.sort = e.target.value;
+                renderProducts();
+            });
+
+            resetBtn.addEventListener('click', () => {
+                state.categories = [];
+                state.colors = [];
+                state.sizes = [];
+                state.sort = 'default';
+                
+                categoryCheckboxes.forEach(chk => chk.checked = false);
+                document.querySelectorAll('.color-filter-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.size-filter-btn').forEach(btn => btn.classList.remove('active'));
+                sortSelect.value = 'default';
+                
+                document.getElementById('collection-heading-title').textContent = "Explore Collections";
+                document.getElementById('collection-label-tag').textContent = "OUR CATALOGUE";
+                
+                renderProducts();
+            });
+
+            // Mobile filter toggle logic
+            if (mobileFilterTrigger && sidebar && closeMobileFilters) {
+                mobileFilterTrigger.addEventListener('click', () => {
+                    sidebar.classList.add('active');
+                    closeMobileFilters.style.display = 'block';
+                    document.body.style.overflow = 'hidden'; // lock scroll
+                });
+
+                const closeFiltersFn = () => {
+                    sidebar.classList.remove('active');
+                    closeMobileFilters.style.display = 'none';
+                    document.body.style.overflow = '';
+                };
+
+                closeMobileFilters.addEventListener('click', closeFiltersFn);
+                
+                // Hide mobile drawer if screen resized back to desktop
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 768) {
+                        sidebar.classList.remove('active');
+                        closeMobileFilters.style.display = 'none';
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+
+            // Run Setup
+            setupFilterOptions();
+            initQueryParams();
+            renderProducts();
+        });
+    </script>
+</body>
+
+</html>

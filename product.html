@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Tweens – Bonded Bra Pioneers</title>
+    <meta name="description"
+        content="Explore custom details, tech specifications, and dimensions of premium intimatewear from Tweens global. Request quotes for private label manufacturing.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Jost:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png"
+        href="https://cdn.shopify.com/s/files/1/0840/3045/6115/files/Tweens_Global_Icon_3584676c-ce83-4d31-8aa0-040ca51cfc5e.png?v=1779365489">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="preloader-inner">
+            <img src="https://cdn.shopify.com/s/files/1/0840/3045/6115/files/WhatsApp_Image_2026-05-21_at_5.00.16_PM.jpg?v=1779363068"
+                alt="Tweens Logo" class="preloader-logo">
+            <div class="preloader-bar">
+                <div class="preloader-fill"></div>
+            </div>
+            <p class="preloader-tagline">Comfort. Crafted for You.</p>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header id="header" class="scrolled">
+        <div class="announcement-bar">
+            <div class="container announcement-inner">
+                <div class="announcement-content">
+                    <a href="#" class="announcement-link"><i class="fas fa-file-pdf"></i> Catalogue</a>
+                    <span class="announcement-sep">|</span>
+                    <div class="announcement-marquee">
+                        <div class="announcement-marquee-track">
+                            <span>Exclusive Bonded Bra Pioneers &bull; Comfortable Seamless Confidence &bull; Worldwide Export & Private Labeling Available &bull; </span>
+                            <span>Exclusive Bonded Bra Pioneers &bull; Comfortable Seamless Confidence &bull; Worldwide Export & Private Labeling Available &bull; </span>
+                            <span>Exclusive Bonded Bra Pioneers &bull; Comfortable Seamless Confidence &bull; Worldwide Export & Private Labeling Available &bull; </span>
+                            <span>Exclusive Bonded Bra Pioneers &bull; Comfortable Seamless Confidence &bull; Worldwide Export & Private Labeling Available &bull; </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container navbar">
+            <a href="index.html" class="logo-link">
+                <img src="https://cdn.shopify.com/s/files/1/0840/3045/6115/files/Tweens.png?v=1760613049"
+                    alt="Tweens Logo" class="nav-logo">
+            </a>
+            <nav>
+                <ul class="nav-links" id="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="about.html" class="nav-link">About Us</a></li>
+                    <li class="has-dropdown">
+                        <a href="collections.html" class="nav-link active">Products <i class="fas fa-chevron-down nav-arrow"></i></a>
+                        <ul class="dropdown">
+                            <li><a href="collections.html?category=bras" class="dropdown-link">Bras</a></li>
+                            <li><a href="collections.html?category=bonded-bras" class="dropdown-link">Bonded Bras</a></li>
+                            <li><a href="collections.html?category=panties" class="dropdown-link">Panties</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="founders-desk.html" class="nav-link">Founder's Desk</a></li>
+                    <li class="has-dropdown">
+                        <a href="#" class="nav-link">More <i class="fas fa-chevron-down nav-arrow"></i></a>
+                        <ul class="dropdown">
+                            <li><a href="faq.html" class="dropdown-link">FAQs</a></li>
+                            <li><a href="shipping-policy.html" class="dropdown-link">Shipping Policy</a></li>
+                            <li><a href="privacy-policy.html" class="dropdown-link">Privacy Policy</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="blogs.html" class="nav-link">Blogs</a></li>
+                    <li><a href="index.html#contact" class="nav-link nav-cta">Enquire Now</a></li>
+                </ul>
+            </nav>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- PRODUCT DETAIL CONTAINER -->
+    <section class="product-detail-container">
+        <div class="container">
+            <div class="product-detail-grid" id="product-detail-grid-container">
+                
+                <!-- GALLERY COLUMN -->
+                <div class="product-gallery">
+                    <div class="gallery-main-view">
+                        <button class="slideshow-btn prev-btn" id="gallery-prev-btn" aria-label="Previous image">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <img src="" alt="" class="gallery-main-img" id="product-main-view-image">
+                        <button class="slideshow-btn next-btn" id="gallery-next-btn" aria-label="Next image">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="gallery-thumbs-row" id="product-gallery-thumbnails-row">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- INFO COLUMN -->
+                <div class="product-info-panel">
+                    <div class="product-breadcrumbs">
+                        <a href="index.html">Home</a> / <a href="collections.html">Collections</a> / <span id="breadcrumb-category">Category</span>
+                    </div>
+
+                    <div class="product-header-block">
+                        <span class="product-cat-tag" id="product-category-tag">CATEGORY</span>
+                        <h1 class="product-main-title" id="product-title-display">Product Name</h1>
+                    </div>
+
+                    <p class="product-main-desc" id="product-description-display">Product long description goes here.</p>
+
+                    <!-- SELECTION WORKFLOW -->
+                    <div class="product-selection-block">
+                        
+                        <!-- Color swatches selector -->
+                        <div class="selection-group">
+                            <div class="selection-label-row">
+                                <span class="selection-title">Select Color: <span class="selected-hint-val" id="selected-color-hint">-</span></span>
+                            </div>
+                            <div class="color-swatches-grid" id="product-color-selector-swatches">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Size swatches selector -->
+                        <div class="selection-group">
+                            <div class="selection-label-row">
+                                <span class="selection-title">Select Size: <span class="selected-hint-val" id="selected-size-hint">-</span></span>
+                                <button class="btn-size-chart-trigger" id="btn-open-size-chart">
+                                    <i class="fas fa-ruler-combined"></i> Sizing Guide
+                                </button>
+                            </div>
+                            <div class="size-boxes-grid" id="product-size-selector-boxes">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Call To Action Buttons (Instead of price/Add-to-cart) -->
+                    <div class="product-detail-actions">
+                        <button class="btn-request-quote" id="btn-request-quote-trigger">
+                            <i class="fas fa-file-invoice-dollar"></i> Request a Quote
+                        </button>
+                        <a href="collections.html" class="btn-explore-products">
+                            <i class="fas fa-th-list"></i> Explore Other Products
+                        </a>
+                    </div>
+
+                    <!-- Tech Specifications Accordion -->
+                    <div class="product-specifications-accordion">
+                        
+                        <!-- Accordion item 1: Technical Specs -->
+                        <div class="accordion-item active">
+                            <button class="accordion-btn">
+                                Specifications <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-body" style="max-height: 500px;">
+                                <div class="accordion-body-inner">
+                                    <div class="specs-grid" id="product-specs-grid">
+                                        <!-- Populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Accordion item 2: Fabric & Care -->
+                        <div class="accordion-item">
+                            <button class="accordion-btn">
+                                Fabric & Care <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-body">
+                                <div class="accordion-body-inner">
+                                    <ul id="product-care-bullets">
+                                        <!-- Populated dynamically -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Accordion item 3: Shipping & Custom Labels -->
+                        <div class="accordion-item">
+                            <button class="accordion-btn">
+                                Logistics & Private Labeling <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="accordion-body">
+                                <div class="accordion-body-inner">
+                                    <ul>
+                                        <li>Worldwide exports support with customs clearances assistance.</li>
+                                        <li>Private labeling and packaging customization options available for bulk orders.</li>
+                                        <li>Rigorous quality-control inspection performed on every batch before loading.</li>
+                                        <li>Standard sample development available upon corporate request.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- SIZING CHART MODAL DIALOG -->
+    <div class="modal-overlay" id="size-chart-modal">
+        <div class="modal-window">
+            <div class="modal-header-section">
+                <h2>Sizing Guide</h2>
+                <button class="btn-close-modal" id="btn-close-size-modal">&times;</button>
+            </div>
+            <div class="modal-body-section">
+                
+                <!-- Tab Selector -->
+                <div class="modal-tabs-header">
+                    <button class="modal-tab-btn active" id="tab-btn-bras">Bras Sizing</button>
+                    <button class="modal-tab-btn" id="tab-btn-panties">Panties Sizing</button>
+                </div>
+
+                <!-- Tab Pane 1: Bras Sizing -->
+                <div class="modal-tab-pane active" id="tab-pane-bras">
+                    <div class="size-chart-table-wrap">
+                        <table class="size-chart-table">
+                            <thead>
+                                <tr>
+                                    <th>Band Size (US/UK)</th>
+                                    <th>Underbust Range (Inches)</th>
+                                    <th>Underbust Range (CM)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>32</strong></td>
+                                    <td>26" - 28"</td>
+                                    <td>65 - 70 cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>34</strong></td>
+                                    <td>28" - 30"</td>
+                                    <td>70 - 75 cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>36</strong></td>
+                                    <td>30" - 32"</td>
+                                    <td>75 - 80 cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>38</strong></td>
+                                    <td>32" - 34"</td>
+                                    <td>80 - 85 cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>40</strong></td>
+                                    <td>34" - 36"</td>
+                                    <td>85 - 90 cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>42</strong></td>
+                                    <td>36" - 38"</td>
+                                    <td>90 - 95 cm</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="sizing-instruction-note">
+                        <strong>How to determine cup size:</strong><br>
+                        Measure around the fullest part of your bust (overbust). Calculate the difference between your overbust and underbust measurements.<br>
+                        • 1" difference = <strong>A Cup</strong> | • 2" difference = <strong>B Cup</strong> | • 3" difference = <strong>C Cup</strong> | • 4" difference = <strong>D Cup</strong>
+                    </div>
+                </div>
+
+                <!-- Tab Pane 2: Panties Sizing -->
+                <div class="modal-tab-pane" id="tab-pane-panties">
+                    <div class="size-chart-table-wrap">
+                        <table class="size-chart-table">
+                            <thead>
+                                <tr>
+                                    <th>Size Tag</th>
+                                    <th>Waist (Inches)</th>
+                                    <th>Hips (Inches)</th>
+                                    <th>Waist (CM)</th>
+                                    <th>Hips (CM)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>S</strong></td>
+                                    <td>25" - 27"</td>
+                                    <td>35" - 37"</td>
+                                    <td>63 - 69 cm</td>
+                                    <td>89 - 94 cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>M</strong></td>
+                                    <td>28" - 30"</td>
+                                    <td>38" - 40"</td>
+                                    <td>70 - 76 cm</td>
+                                    <td>95 - 101 cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>L</strong></td>
+                                    <td>31" - 33"</td>
+                                    <td>41" - 43"</td>
+                                    <td>77 - 84 cm</td>
+                                    <td>102 - 109 cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>XL</strong></td>
+                                    <td>34" - 36"</td>
+                                    <td>44" - 46"</td>
+                                    <td>85 - 91 cm</td>
+                                    <td>110 - 117 cm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>XXL</strong></td>
+                                    <td>37" - 39"</td>
+                                    <td>47" - 49"</td>
+                                    <td>92 - 99 cm</td>
+                                    <td>118 - 124 cm</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="sizing-instruction-note">
+                        <strong>Measuring Tips:</strong> Keep the tape parallel to the floor. Measure waist at the narrowest point and hips at the fullest part of your buttocks.
+                    </div>
+                </div>
+
+                <!-- Measurement Graphic Helper -->
+                <div class="sizing-diagram-container">
+                    <div class="sizing-diagram-graphics">
+                        <i class="fas fa-tape"></i>
+                    </div>
+                    <div class="sizing-diagram-text">
+                        <h4>Fit Guarantee</h4>
+                        <p>Our sizing conforms to standard international grids. If your measurements span two sizes, we suggest selecting the larger size for a more relaxed, comfortable fit.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- REQUEST QUOTE MODAL DIALOG -->
+    <div class="modal-overlay" id="quote-request-modal">
+        <div class="modal-window">
+            <div class="modal-header-section">
+                <h2>Request a Quote</h2>
+                <button class="btn-close-modal" id="btn-close-quote-modal">&times;</button>
+            </div>
+            
+            <!-- FORM BODY -->
+            <div class="modal-body-section" id="quote-modal-body-content">
+                
+                <!-- Product details preview card -->
+                <div class="product-quote-meta-preview">
+                    <div class="meta-preview-img-frame">
+                        <img src="" alt="" id="quote-meta-img-preview">
+                    </div>
+                    <div class="meta-preview-info">
+                        <div class="meta-preview-title" id="quote-meta-title-preview">Product Name</div>
+                        <div class="meta-preview-specs">
+                            Selected Color: <strong id="quote-meta-color-preview">-</strong> | Selected Size: <strong id="quote-meta-size-preview">-</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <br>
+                
+                <!-- Interactive Form -->
+                <!-- We post to the validated Google Sheets Apps Script Web App URL for consistency and logging -->
+                <form class="quote-request-form" id="quote-form-submission">
+                    <!-- Hidden fields to print selected product configurations in sheet columns -->
+                    <input type="hidden" name="product_name" id="hidden-prod-name">
+                    <input type="hidden" name="selected_color" id="hidden-prod-color">
+                    <input type="hidden" name="selected_size" id="hidden-prod-size">
+                    <!-- Sheet target configuration for quote request logging -->
+                    <input type="hidden" name="sheetName" value="requested quote">
+                    <input type="hidden" name="sheet_name" value="requested quote">
+                    <input type="hidden" name="sheet" value="requested quote">
+                    <input type="hidden" name="tab_name" value="requested quote">
+                    <input type="hidden" name="tab" value="requested quote">
+                    
+                    <div class="form-grid-2">
+                        <div class="form-input-group">
+                            <label for="quote-user-name">Your Name *</label>
+                            <input type="text" id="quote-user-name" name="name" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-input-group">
+                            <label for="quote-user-email">Email Address *</label>
+                            <input type="email" id="quote-user-email" name="email" placeholder="name@company.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-input-group">
+                            <label for="quote-user-phone">Phone Number *</label>
+                            <input type="tel" id="quote-user-phone" name="phone" placeholder="Enter mobile number" required>
+                        </div>
+                        <div class="form-input-group">
+                            <label for="quote-quantity">Estimated Quantity (Pcs) *</label>
+                            <input type="number" id="quote-quantity" name="quantity" min="1" value="100" placeholder="Minimum order size" required>
+                        </div>
+                    </div>
+
+                    <div class="form-input-group">
+                        <label for="quote-message">Requirements / Message *</label>
+                        <textarea id="quote-message" name="message" placeholder="Describe any custom labeling, packaging, styling specifications, or shipping timelines needed." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-form-submit" id="btn-quote-form-submit">
+                        <span>Send Request Quote</span>
+                        <div class="submit-spinner" id="quote-submit-loader"></div>
+                    </button>
+                </form>
+
+            </div>
+
+            <!-- SUCCESS DIALOG VIEW (HIDDEN BY DEFAULT) -->
+            <div class="modal-body-section" id="quote-modal-success-content" style="display: none;">
+                <div class="quote-submit-success-view">
+                    <div class="success-icon-wrap">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h3>Quote Request Submitted!</h3>
+                    <p>Thank you for your enquiry. Our intimatewear specialists and account managers will review your custom specs and contact you within 24 hours.</p>
+                    <button class="btn btn-primary" id="btn-close-success-view-trigger" style="margin-top: 1rem;">Close</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- HIDE IFRAME FOR SUBMISSION -->
+    <iframe name="quote_hidden_iframe" id="quote_hidden_iframe" style="display:none;" onload="if(window.submittedQuote){ window.handleQuoteSubmitSuccess(); }"></iframe>
+
+    <!-- SHARED DATA -->
+    <script src="products-data.js"></script>
+    <script src="scripts.js"></script>
+
+    <!-- PRODUCT DETAIL LOGIC -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State
+            const state = {
+                product: null,
+                selectedColor: null,
+                selectedSize: null,
+                currentImageIndex: 0
+            };
+
+            // DOM Elements
+            const mainImg = document.getElementById('product-main-view-image');
+            const thumbsRow = document.getElementById('product-gallery-thumbnails-row');
+            
+            const breadcrumbCategory = document.getElementById('breadcrumb-category');
+            const categoryTag = document.getElementById('product-category-tag');
+            const titleDisplay = document.getElementById('product-title-display');
+            const descDisplay = document.getElementById('product-description-display');
+            
+            const colorHint = document.getElementById('selected-color-hint');
+            const colorSwatchesGrid = document.getElementById('product-color-selector-swatches');
+            
+            const sizeHint = document.getElementById('selected-size-hint');
+            const sizeBoxesGrid = document.getElementById('product-size-selector-boxes');
+            
+            const specsGrid = document.getElementById('product-specs-grid');
+            const careBullets = document.getElementById('product-care-bullets');
+
+            // Slideshow overlay buttons
+            const prevBtn = document.getElementById('gallery-prev-btn');
+            const nextBtn = document.getElementById('gallery-next-btn');
+
+            // Modal elements
+            const sizeModal = document.getElementById('size-chart-modal');
+            const quoteModal = document.getElementById('quote-request-modal');
+            const openSizeBtn = document.getElementById('btn-open-size-chart');
+            const closeSizeBtn = document.getElementById('btn-close-size-modal');
+            const openQuoteBtn = document.getElementById('btn-request-quote-trigger');
+            const closeQuoteBtn = document.getElementById('btn-close-quote-modal');
+            
+            // Tab buttons size modal
+            const tabBtnBras = document.getElementById('tab-btn-bras');
+            const tabBtnPanties = document.getElementById('tab-btn-panties');
+            const tabPaneBras = document.getElementById('tab-pane-bras');
+            const tabPanePanties = document.getElementById('tab-pane-panties');
+
+            // Form elements
+            const quoteForm = document.getElementById('quote-form-submission');
+            const quoteBody = document.getElementById('quote-modal-body-content');
+            const quoteSuccess = document.getElementById('quote-modal-success-content');
+            const submitBtn = document.getElementById('btn-quote-form-submit');
+            const loader = document.getElementById('quote-submit-loader');
+            const closeSuccessBtn = document.getElementById('btn-close-success-view-trigger');
+            
+            // Hidden fields quote
+            const hiddenName = document.getElementById('hidden-prod-name');
+            const hiddenColor = document.getElementById('hidden-prod-color');
+            const hiddenSize = document.getElementById('hidden-prod-size');
+
+            // Load product data
+            const loadProduct = () => {
+                const params = new URLSearchParams(window.location.search);
+                const id = params.get('id');
+                
+                const product = PRODUCTS_DATA.find(p => p.id === id);
+                if (!product) {
+                    // Fallback to collections if invalid product ID
+                    window.location.href = 'collections.html';
+                    return;
+                }
+                
+                state.product = product;
+                state.selectedColor = product.colors[0];
+                state.selectedSize = product.sizes[0];
+                state.currentImageIndex = 0;
+
+                // Render basic info
+                const cleanCat = product.category.replace('-', ' ');
+                breadcrumbCategory.innerHTML = `<a href="collections.html?category=${product.category}">${cleanCat}</a>`;
+                categoryTag.textContent = cleanCat;
+                titleDisplay.textContent = product.name;
+                descDisplay.textContent = product.description;
+
+                // Render active values hints
+                colorHint.textContent = state.selectedColor.name;
+                sizeHint.textContent = state.selectedSize;
+
+                // Render main image
+                mainImg.src = state.selectedColor.image ? state.selectedColor.image : getProductPlaceholderSVG(product.category, state.selectedColor.hex);
+                mainImg.alt = `${product.name} in ${state.selectedColor.name}`;
+
+                // Setup tabs in size chart modal based on product category
+                if (product.category === 'panties') {
+                    tabBtnPanties.click();
+                } else {
+                    tabBtnBras.click();
+                }
+
+                renderGallery();
+                renderSwatches();
+                renderSpecs();
+            };
+
+            // Render gallery thumbnails
+            const renderGallery = () => {
+                const colorImages = state.selectedColor.images || [];
+                const totalImages = colorImages.length > 0 ? colorImages.length : state.product.colors.length;
+
+                // Toggle slideshow buttons visibility based on image count
+                if (prevBtn && nextBtn) {
+                    prevBtn.style.display = totalImages > 1 ? 'flex' : 'none';
+                    nextBtn.style.display = totalImages > 1 ? 'flex' : 'none';
+                }
+
+                if (colorImages.length > 0) {
+                    thumbsRow.innerHTML = colorImages.map((imgUrl, i) => `
+                        <button class="gallery-thumb-btn ${i === state.currentImageIndex ? 'active' : ''}" 
+                                data-index="${i}"
+                                data-img-url="${imgUrl}"
+                                aria-label="View gallery image ${i + 1}">
+                            <img src="${imgUrl}" alt="${state.product.name}">
+                        </button>
+                    `).join('');
+
+                    // Thumbnail click action for color-specific images
+                    document.querySelectorAll('.gallery-thumb-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const index = parseInt(btn.dataset.index, 10);
+                            state.currentImageIndex = index;
+
+                            document.querySelectorAll('.gallery-thumb-btn').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            
+                            const imgUrl = btn.dataset.imgUrl;
+                            mainImg.style.opacity = '0.5';
+                            setTimeout(() => {
+                                mainImg.src = imgUrl;
+                                mainImg.style.opacity = '1';
+                            }, 200);
+                        });
+                    });
+                } else {
+                    // Fallback to mapping all colors
+                    thumbsRow.innerHTML = state.product.colors.map((c, i) => {
+                        const thumbPlaceholder = c.image ? c.image : getProductPlaceholderSVG(state.product.category, c.hex);
+                        const isActive = i === state.currentImageIndex;
+                        return `
+                            <button class="gallery-thumb-btn ${isActive ? 'active' : ''}" 
+                                    data-index="${i}"
+                                    aria-label="View ${c.name} color gallery image">
+                                <img src="${thumbPlaceholder}" alt="${c.name}">
+                            </button>
+                        `;
+                    }).join('');
+
+                    // Thumbnail click action (original logic)
+                    document.querySelectorAll('.gallery-thumb-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const colorIndex = parseInt(btn.dataset.index, 10);
+                            state.currentImageIndex = colorIndex;
+
+                            document.querySelectorAll('.gallery-thumb-btn').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            
+                            const color = state.product.colors[colorIndex];
+                            
+                            state.selectedColor = color;
+                            colorHint.textContent = color.name;
+                            
+                            document.querySelectorAll('.color-swatch-selector').forEach(s => {
+                                s.classList.toggle('active', s.dataset.colorName === color.name);
+                            });
+
+                            mainImg.style.opacity = '0.5';
+                            setTimeout(() => {
+                                mainImg.src = color.image ? color.image : getProductPlaceholderSVG(state.product.category, color.hex);
+                                mainImg.alt = `${state.product.name} in ${color.name}`;
+                                mainImg.style.opacity = '1';
+                                renderGallery(); // Re-render to update thumbnails and active state
+                            }, 200);
+                        });
+                    });
+                }
+
+                // Scroll the active thumbnail into view
+                const activeThumb = thumbsRow.querySelector('.gallery-thumb-btn.active');
+                if (activeThumb) {
+                    activeThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+            };
+
+            // Slideshow navigation handler
+            const navigateGallery = (direction) => {
+                const colorImages = state.selectedColor.images || [];
+                const totalImages = colorImages.length > 0 ? colorImages.length : state.product.colors.length;
+                
+                if (totalImages <= 1) return; // Nothing to cycle
+                
+                state.currentImageIndex = (state.currentImageIndex + direction + totalImages) % totalImages;
+                
+                // Select the button at this index and trigger a click event to reuse all state management
+                const thumbBtns = document.querySelectorAll('.gallery-thumb-btn');
+                if (thumbBtns[state.currentImageIndex]) {
+                    thumbBtns[state.currentImageIndex].click();
+                }
+            };
+
+            if (prevBtn && nextBtn) {
+                prevBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Avoid triggering parent clicks
+                    navigateGallery(-1);
+                });
+                nextBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Avoid triggering parent clicks
+                    navigateGallery(1);
+                });
+            }
+
+            // Render interactive color & size selectors
+            const renderSwatches = () => {
+                // Color swatches selector
+                colorSwatchesGrid.innerHTML = state.product.colors.map((c, i) => `
+                    <button class="color-filter-btn color-swatch-selector ${i === 0 ? 'active' : ''}" 
+                            data-color-name="${c.name}" 
+                            data-hex="${c.hex}" 
+                            style="background-color: ${c.hex};"
+                            aria-label="Select color ${c.name}">
+                    </button>
+                `).join('');
+
+                // Color swatch change event
+                document.querySelectorAll('.color-swatch-selector').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const colorName = btn.dataset.colorName;
+                        const hex = btn.dataset.hex;
+                        
+                        const colorObj = state.product.colors.find(c => c.name === colorName) || { name: colorName, hex: hex };
+                        state.selectedColor = colorObj;
+                        colorHint.textContent = colorName;
+                        state.currentImageIndex = 0; // Reset image index on color change!
+                        
+                        document.querySelectorAll('.color-swatch-selector').forEach(s => s.classList.remove('active'));
+                        btn.classList.add('active');
+
+                        // Sync thumbnails active status (only if gallery is in fallback mode)
+                        document.querySelectorAll('.gallery-thumb-btn').forEach(thumb => {
+                            if (thumb.dataset.index !== undefined && thumb.dataset.index !== null && thumb.dataset.index !== '') {
+                                const index = parseInt(thumb.dataset.index, 10);
+                                const color = state.product.colors[index];
+                                if (color) {
+                                    const isActive = color.name === colorName;
+                                    thumb.classList.toggle('active', isActive);
+                                    if (isActive) {
+                                        thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                                    }
+                                }
+                            }
+                        });
+
+                        // Swap main image
+                        mainImg.style.opacity = '0.5';
+                        setTimeout(() => {
+                            const colorObj = state.product.colors.find(c => c.hex === hex);
+                            mainImg.src = (colorObj && colorObj.image) ? colorObj.image : getProductPlaceholderSVG(state.product.category, hex);
+                            mainImg.alt = `${state.product.name} in ${colorName}`;
+                            mainImg.style.opacity = '1';
+                            renderGallery(); // Re-render gallery thumbnails for the new color!
+                        }, 200);
+                    });
+                });
+
+                // Size box selectors
+                sizeBoxesGrid.innerHTML = state.product.sizes.map((s, i) => `
+                    <button class="size-filter-btn size-box-selector ${i === 0 ? 'active' : ''}" 
+                            data-size="${s}">
+                        ${s}
+                    </button>
+                `).join('');
+
+                // Size box change event
+                document.querySelectorAll('.size-box-selector').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const size = btn.dataset.size;
+                        state.selectedSize = size;
+                        sizeHint.textContent = size;
+                        
+                        document.querySelectorAll('.size-box-selector').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    });
+                });
+            };
+
+            // Render specs table and care guidelines
+            const renderSpecs = () => {
+                const specs = state.product.features;
+                specsGrid.innerHTML = `
+                    <div class="spec-row">
+                        <span class="spec-label">Padding</span>
+                        <span class="spec-val">${specs.padding}</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Underwire</span>
+                        <span class="spec-val">${specs.wire}</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Coverage</span>
+                        <span class="spec-val">${specs.coverage}</span>
+                    </div>
+                    <div class="spec-row">
+                        <span class="spec-label">Fabric / Fiber</span>
+                        <span class="spec-val">${specs.fabric}</span>
+                    </div>
+                `;
+
+                careBullets.innerHTML = state.product.details.map(d => `
+                    <li>${d}</li>
+                `).join('');
+            };
+
+            // Accordion collapsible menu logic
+            document.querySelectorAll('.accordion-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const item = btn.parentElement;
+                    const body = item.querySelector('.accordion-body');
+                    const isActive = item.classList.contains('active');
+
+                    // Close all
+                    document.querySelectorAll('.accordion-item').forEach(el => {
+                        el.classList.remove('active');
+                        el.querySelector('.accordion-body').style.maxHeight = null;
+                    });
+
+                    if (!isActive) {
+                        item.classList.add('active');
+                        body.style.maxHeight = body.scrollHeight + 'px';
+                    }
+                });
+            });
+
+            // Sizing modal action
+            const toggleModal = (modal, open) => {
+                if (open) {
+                    modal.style.display = 'flex';
+                    setTimeout(() => {
+                        modal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }, 10);
+                } else {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                    }, 400);
+                }
+            };
+
+            openSizeBtn.addEventListener('click', () => toggleModal(sizeModal, true));
+            closeSizeBtn.addEventListener('click', () => toggleModal(sizeModal, false));
+            
+            sizeModal.addEventListener('click', (e) => {
+                if (e.target === sizeModal) toggleModal(sizeModal, false);
+            });
+
+            // Size Chart modal tabs logic
+            const switchTab = (activeBtn, activePane, inactiveBtn, inactivePane) => {
+                activeBtn.classList.add('active');
+                inactiveBtn.classList.remove('active');
+                activePane.classList.add('active');
+                inactivePane.classList.remove('active');
+            };
+
+            tabBtnBras.addEventListener('click', () => {
+                switchTab(tabBtnBras, tabPaneBras, tabBtnPanties, tabPanePanties);
+            });
+
+            tabBtnPanties.addEventListener('click', () => {
+                switchTab(tabBtnPanties, tabPanePanties, tabBtnBras, tabPaneBras);
+            });
+
+            // Quote Modal actions
+            openQuoteBtn.addEventListener('click', () => {
+                // Populate preview cards
+                document.getElementById('quote-meta-title-preview').textContent = state.product.name;
+                document.getElementById('quote-meta-color-preview').textContent = state.selectedColor.name;
+                document.getElementById('quote-meta-size-preview').textContent = state.selectedSize;
+                
+                const previewImg = document.getElementById('quote-meta-img-preview');
+                previewImg.src = state.selectedColor.image ? state.selectedColor.image : getProductPlaceholderSVG(state.product.category, state.selectedColor.hex);
+                previewImg.alt = state.product.name;
+
+                // Populate hidden form fields
+                hiddenName.value = state.product.name;
+                hiddenColor.value = state.selectedColor.name;
+                hiddenSize.value = state.selectedSize;
+
+                // Ensure form and success view display states are reset
+                quoteBody.style.display = 'block';
+                quoteSuccess.style.display = 'none';
+
+                toggleModal(quoteModal, true);
+            });
+
+            closeQuoteBtn.addEventListener('click', () => toggleModal(quoteModal, false));
+            closeSuccessBtn.addEventListener('click', () => toggleModal(quoteModal, false));
+
+            quoteModal.addEventListener('click', (e) => {
+                if (e.target === quoteModal) toggleModal(quoteModal, false);
+            });
+
+            // Define global callback for iframe onload
+            window.handleQuoteSubmitSuccess = () => {
+                window.submittedQuote = false;
+                
+                // Reset submit button state
+                submitBtn.disabled = false;
+                loader.classList.remove('active');
+                submitBtn.querySelector('span').textContent = 'Send Request Quote';
+                quoteForm.reset();
+
+                // Swap view to success box
+                quoteBody.style.display = 'none';
+                quoteSuccess.style.display = 'block';
+            };
+
+            // Form Submit handler - matches working pattern from homepage contact form
+            quoteForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Disable button and show loader
+                submitBtn.disabled = true;
+                loader.classList.add('active');
+                submitBtn.querySelector('span').textContent = 'Sending...';
+
+                // Google Sheets Web App URL for logging submissions
+                const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxM-0Rsa4LbTNORU5asjNQlVnz_i3ds9hSKOrguxJUouKqB2A_fVoWjGZ5RcCJVQQz1/exec';
+
+                quoteForm.action = SCRIPT_URL;
+                quoteForm.target = 'quote_hidden_iframe';
+                quoteForm.method = 'POST';
+
+                window.submittedQuote = true;
+                quoteForm.submit();
+            });
+
+            // Run Initialization
+            loadProduct();
+        });
+    </script>
+</body>
+
+</html>
