@@ -322,12 +322,14 @@ async function decideBraModelAndCopy(theme, braImages, modelImages, sheetRows, a
   parts.push({ text:
 `You are the creative director for "Tweens", a women's innerwear brand. All models shown are adults. Below are reference images: first the BRA photos (indexed from 0), then the MODEL photos (indexed from 0). For the campaign theme given, pick the single bra and the single model that together fit the Tweens brand identity and this theme best, and write tasteful, upbeat ad copy for this theme.
 
+Also write a short neutral appearance description of the chosen model (build, approximate age range like "mid-20s", hair length/color/texture, skin tone) that could stand in for her photo if needed - describe her as a generic person, not by name or any identifying detail.
+
 BRA_COUNT=${braImages.length}
 MODEL_COUNT=${modelImages.length}
 THEME: "${theme}"${sheetContext}
 
 Respond with ONLY strict JSON, no markdown, matching this shape:
-{"braIndex": number, "modelIndex": number, "headline": "max 5 words", "subheading": "max 7 words", "cta": "max 3 words or empty string", "reasoning": "one sentence on why this bra+model fit the theme and the Tweens brand"}` });
+{"braIndex": number, "modelIndex": number, "headline": "max 5 words", "subheading": "max 7 words", "cta": "max 3 words or empty string", "reasoning": "one sentence on why this bra+model fit the theme and the Tweens brand", "modelDescription": "one sentence neutral appearance description"}` });
 
   braImages.forEach((img, i) => {
     parts.push({ text: `BRA_IMAGE_INDEX_${i}` });
@@ -350,7 +352,7 @@ Respond with ONLY strict JSON, no markdown, matching this shape:
   return parsed;
 }
 
-function buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal) {
+function buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, useDescriptionOnly) {
   const realismBlock = hyperReal ? `
 
 HYPER-REALISM (critical):
@@ -359,11 +361,17 @@ HYPER-REALISM (critical):
 - Fabric of the bra must show real woven/knit texture, individual thread detail, and natural fabric sheen - not flat or illustrated.
 - Output should be indistinguishable from an unretouched RAW professional photograph, high dynamic range, no plastic skin, no over-smoothing, no beauty-filter look.` : '';
 
+  const imageReferences = useDescriptionOnly
+    ? `IMAGE REFERENCES:
+- There is no model photo reference. Generate a fictional adult woman model matching this description: ${decision.modelDescription || 'adult woman, natural build, warm expression'}.
+- Image 1 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.`
+    : `IMAGE REFERENCES:
+- Image 1 is the MODEL REFERENCE. Use it ONLY for: face structure, skin tone, hair color, hair texture, body type, and overall appearance. Do NOT copy any clothing, pose, or background from Image 1.
+- Image 2 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.`;
+
   return `You are generating a professional fashion campaign image for TWEENS, a women's innerwear brand. The model is an adult woman.${realismBlock}
 
-IMAGE REFERENCES:
-- Image 1 is the MODEL REFERENCE. Use it ONLY for: face structure, skin tone, hair color, hair texture, body type, and overall appearance. Do NOT copy any clothing, pose, or background from Image 1.
-- Image 2 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.
+${imageReferences}
 
 POSE & BODY DIRECTION:
 - Model stands facing forward, relaxed, friendly and confident posture, both arms visible at her sides.
@@ -408,32 +416,47 @@ TECHNICAL QUALITY:
 - Commercial fashion campaign quality, photorealistic, not illustrated, not stylised, sharp focus on the product.${hyperReal ? ' Shot on a Hasselblad medium-format camera, 80mm lens, professional studio lighting, with true human skin texture including visible pores - not smoothed or plastic.' : ''}
 
 NEGATIVE INSTRUCTIONS:
-- Do NOT alter model's face, skin tone, hair color, or body from Image 1
+${useDescriptionOnly ? '- Do NOT alter bra color, shape, texture, or silhouette from the product reference image' : `- Do NOT alter model's face, skin tone, hair color, or body from Image 1
 - Do NOT alter bra color, shape, texture, or silhouette from Image 2
+- Do NOT add tattoos, jewelry, piercings, or accessories not in Image 1`}
 - Do NOT let hair fall over bra straps, armhole edges, or bottom band
-- Do NOT add tattoos, jewelry, piercings, or accessories not in Image 1
 - Do NOT use dark, moody, cold-toned, or suggestive backgrounds or lighting
 - Do NOT add watermarks, logos, or extra branding
 - Do NOT generate multiple models or background figures
 - Render all quoted text exactly as written, no spelling changes, no added or duplicate words.`;
 }
 
-async function generateImage(decision, braImg, modelImg, theme, headlineColor, subColor, aspect, hyperReal, apiKey) {
-  const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal);
-  const parts = [
-    { text: prompt },
-    { text: 'Image 1 (MODEL REFERENCE):' },
-    { inlineData: { mimeType: modelImg.mimeType, data: modelImg.data } },
-    { text: 'Image 2 (PRODUCT REFERENCE - the bra):' },
-    { inlineData: { mimeType: braImg.mimeType, data: braImg.data } }
-  ];
+async function requestGeminiImage(prompt, imageParts, apiKey) {
+  const parts = [{ text: prompt }, ...imageParts];
   const json = await callGemini(GEMINI_IMAGE_MODEL, [{ role: 'user', parts }], {}, apiKey);
   const imgPart = json.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
   if (!imgPart) {
     const textPart = json.candidates?.[0]?.content?.parts?.find(p => p.text);
-    throw new Error('No image returned. ' + (textPart?.text || JSON.stringify(json).slice(0, 300)));
+    const finishReason = json.candidates?.[0]?.finishReason || '';
+    throw new Error(`${finishReason || 'No image returned'}. ` + (textPart?.text || JSON.stringify(json).slice(0, 300)));
   }
   return `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
+}
+
+async function generateImage(decision, braImg, modelImg, theme, headlineColor, subColor, aspect, hyperReal, apiKey) {
+  const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, false);
+  try {
+    const url = await requestGeminiImage(prompt, [
+      { text: 'Image 1 (MODEL REFERENCE):' },
+      { inlineData: { mimeType: modelImg.mimeType, data: modelImg.data } },
+      { text: 'Image 2 (PRODUCT REFERENCE - the bra):' },
+      { inlineData: { mimeType: braImg.mimeType, data: braImg.data } }
+    ], apiKey);
+    return { url, usedFallback: false };
+  } catch (err) {
+    if (!/IMAGE_OTHER|SAFETY|No image returned/i.test(err.message)) throw err;
+    const fallbackPrompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, true);
+    const url = await requestGeminiImage(fallbackPrompt, [
+      { text: 'Image 1 (PRODUCT REFERENCE - the bra):' },
+      { inlineData: { mimeType: braImg.mimeType, data: braImg.data } }
+    ], apiKey);
+    return { url, usedFallback: true };
+  }
 }
 
 function addResultCard(theme, status) {
@@ -450,10 +473,13 @@ function addResultCard(theme, status) {
   return card;
 }
 
-function fillResultCard(card, imgDataUrl, decision, braName, modelName) {
+function fillResultCard(card, imgDataUrl, decision, braName, modelName, usedFallback) {
   card.querySelector('div').outerHTML = `<img src="${imgDataUrl}">`;
   const meta = card.querySelector('.meta');
-  meta.innerHTML = `<span class="badge">Bra: ${braName}</span><span class="badge">Model: ${modelName}</span><br>${decision.reasoning || ''}`;
+  const fallbackNote = usedFallback
+    ? `<br><span class="badge" style="border-color:var(--accent); color:var(--accent);">AI-generated model (photo ref was blocked)</span>`
+    : '';
+  meta.innerHTML = `<span class="badge">Bra: ${braName}</span><span class="badge">Model: ${modelName}</span>${fallbackNote}<br>${decision.reasoning || ''}`;
   const actions = document.createElement('div');
   actions.className = 'result-actions';
   const a = document.createElement('a');
@@ -505,9 +531,9 @@ $('generateBtn').addEventListener('click', async () => {
       const bra = state.braImages[decision.braIndex];
       const model = state.modelImages[decision.modelIndex];
       logLine(`[${theme}] picked bra "${bra.name}" + model "${model.name}". Generating image...`);
-      const imgDataUrl = await generateImage(decision, bra, model, theme, headlineColor, subColor, aspect, hyperReal, apiKey);
-      fillResultCard(card, imgDataUrl, decision, bra.name, model.name);
-      logLine(`[${theme}] done.`);
+      const { url: imgDataUrl, usedFallback } = await generateImage(decision, bra, model, theme, headlineColor, subColor, aspect, hyperReal, apiKey);
+      fillResultCard(card, imgDataUrl, decision, bra.name, model.name, usedFallback);
+      logLine(`[${theme}] done.${usedFallback ? ' (used AI-generated model - photo reference was blocked by safety filters)' : ''}`);
     } catch (err) {
       failResultCard(card, err);
       logLine(`[${theme}] ERROR: ${err.message || err}`);
