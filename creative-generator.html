@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tweens AI Creative Generator</title>
+<style>
+  :root{
+    --bg:#120c10; --panel:#1c1518; --panel-2:#231a1e; --border:#3a2c30;
+    --text:#f5ece9; --muted:#b79ba0; --accent:#e88fa8; --accent-2:#c9748f;
+    --ok:#7fd8a4; --err:#f28b82;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); padding:24px;
+  }
+  h1{font-size:22px; margin:0 0 4px;}
+  .sub{color:var(--muted); font-size:13px; margin:0 0 24px;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:1200px; margin:0 auto;}
+  @media(max-width:900px){.grid{grid-template-columns:1fr;}}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px;}
+  .card h2{font-size:15px; margin:0 0 12px; color:var(--accent);}
+  label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px; margin-top:12px;}
+  label:first-child{margin-top:0;}
+  input[type=text], input[type=password], textarea, input[type=color]{
+    width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:9px 10px; font-size:13px; font-family:inherit;
+  }
+  textarea{resize:vertical; min-height:70px;}
+  .dropzone{
+    border:1.5px dashed var(--border); border-radius:10px; padding:14px; text-align:center;
+    color:var(--muted); font-size:12px; cursor:pointer; background:var(--panel-2);
+  }
+  .dropzone:hover{border-color:var(--accent);}
+  .thumbs{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+  .thumb{position:relative; width:64px; height:64px; border-radius:8px; overflow:hidden; border:1px solid var(--border);}
+  .thumb img{width:100%; height:100%; object-fit:cover; display:block;}
+  .thumb button{
+    position:absolute; top:2px; right:2px; background:rgba(0,0,0,.6); color:#fff; border:none;
+    border-radius:50%; width:18px; height:18px; font-size:11px; line-height:18px; cursor:pointer; padding:0;
+  }
+  .thumb .name{position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,.55); font-size:9px; padding:1px 3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .btn{
+    background:var(--accent); color:#28151b; border:none; border-radius:8px; padding:11px 16px;
+    font-size:13px; font-weight:600; cursor:pointer; width:100%; margin-top:16px;
+  }
+  .btn:hover{background:var(--accent-2);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .btn.secondary{background:transparent; border:1px solid var(--border); color:var(--text); width:auto; margin-top:0;}
+  .hint{font-size:11px; color:var(--muted); margin-top:6px;}
+  .log{
+    max-width:1200px; margin:20px auto 0; background:var(--panel); border:1px solid var(--border);
+    border-radius:12px; padding:14px 18px; font-size:12px; color:var(--muted); max-height:160px; overflow-y:auto;
+    font-family:ui-monospace,Consolas,monospace; white-space:pre-wrap;
+  }
+  .results{max-width:1200px; margin:20px auto 0; display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px;}
+  .result-card{background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden;}
+  .result-card img{width:100%; display:block; background:var(--panel-2);}
+  .result-body{padding:12px 14px;}
+  .result-body .theme{font-size:12px; color:var(--accent); margin-bottom:6px; font-weight:600;}
+  .result-body .meta{font-size:11px; color:var(--muted); line-height:1.5;}
+  .result-actions{display:flex; gap:8px; padding:0 14px 14px;}
+  .badge{display:inline-block; background:var(--panel-2); border:1px solid var(--border); border-radius:5px; padding:2px 6px; font-size:10px; color:var(--muted); margin-right:4px;}
+  .error-box{border-color:var(--err) !important; color:var(--err);}
+  .file-input{display:none;}
+</style>
+</head>
+<body>
+
+<h1>Tweens AI Creative Generator</h1>
+<p class="sub">Upload every bra and both models once. Describe each campaign theme. AI picks the bra, the model, and the ad copy, then generates the finished creative.</p>
+
+<div class="grid">
+  <div class="card">
+    <h2>1 &middot; Assets</h2>
+
+    <label>Google AI Studio API key (Gemini)</label>
+    <input type="password" id="apiKey" placeholder="AIza...">
+    <div class="hint">Stored only in your browser (localStorage). Never uploaded anywhere else. Get one at aistudio.google.com/apikey.</div>
+
+    <label>Bra photos (upload all of them at once)</label>
+    <div class="dropzone" id="braDrop">Click or drop bra product photos here</div>
+    <input type="file" id="braFiles" class="file-input" accept="image/*" multiple>
+    <div class="thumbs" id="braThumbs"></div>
+
+    <label>Model photos (both models)</label>
+    <div class="dropzone" id="modelDrop">Click or drop model reference photos here</div>
+    <input type="file" id="modelFiles" class="file-input" accept="image/*" multiple>
+    <div class="thumbs" id="modelThumbs"></div>
+  </div>
+
+  <div class="card">
+    <h2>2 &middot; Campaign brief</h2>
+    <label>Theme(s) / raw data &mdash; one campaign per line</label>
+    <textarea id="themes" placeholder="e.g.
+Back to school sale, fun and confident, 20% off
+Festive collection launch, soft pastel colors, first bra comfort
+Everyday comfort, no-elastic construction, feature callout"></textarea>
+    <div class="hint">Each line becomes one generated creative. AI reads all bra + model photos and picks the best match per line.</div>
+
+    <div class="row2">
+      <div>
+        <label>Headline color</label>
+        <input type="color" id="headlineColor" value="#1c1c1c">
+      </div>
+      <div>
+        <label>Sub-text color</label>
+        <input type="color" id="subColor" value="#c9748f">
+      </div>
+    </div>
+
+    <label>Aspect ratio</label>
+    <input type="text" id="aspect" value="4:5 portrait">
+
+    <button class="btn" id="generateBtn">Generate creatives</button>
+  </div>
+</div>
+
+<div class="log" id="log">Ready. Add your API key, upload assets, and describe a theme to begin.</div>
+<div class="results" id="results"></div>
+
+<script>
+const state = { braImages: [], modelImages: [] };
+
+const $ = id => document.getElementById(id);
+const apiKeyInput = $('apiKey');
+apiKeyInput.value = localStorage.getItem('tweens_gemini_key') || '';
+apiKeyInput.addEventListener('input', () => localStorage.setItem('tweens_gemini_key', apiKeyInput.value.trim()));
+
+function logLine(msg) {
+  const el = $('log');
+  el.textContent += '\n' + msg;
+  el.scrollTop = el.scrollHeight;
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function setupUploader(dropId, inputId, thumbsId, list) {
+  const drop = $(dropId), input = $(inputId), thumbs = $(thumbsId);
+  drop.addEventListener('click', () => input.click());
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
+  drop.addEventListener('dragleave', () => { drop.style.borderColor = 'var(--border)'; });
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.style.borderColor = 'var(--border)';
+    handleFiles(e.dataTransfer.files, list, thumbs);
+  });
+  input.addEventListener('change', () => handleFiles(input.files, list, thumbs));
+}
+
+async function handleFiles(fileList, list, thumbsEl) {
+  for (const file of fileList) {
+    if (!file.type.startsWith('image/')) continue;
+    const b64 = await fileToBase64(file);
+    const item = { name: file.name, mimeType: file.type, data: b64 };
+    list.push(item);
+    renderThumb(item, list, thumbsEl);
+  }
+}
+
+function renderThumb(item, list, thumbsEl) {
+  const div = document.createElement('div');
+  div.className = 'thumb';
+  div.innerHTML = `<img src="data:${item.mimeType};base64,${item.data}"><div class="name">${item.name}</div><button title="remove">&times;</button>`;
+  div.querySelector('button').addEventListener('click', () => {
+    const idx = list.indexOf(item);
+    if (idx > -1) list.splice(idx, 1);
+    div.remove();
+  });
+  thumbsEl.appendChild(div);
+}
+
+setupUploader('braDrop', 'braFiles', 'braThumbs', state.braImages);
+setupUploader('modelDrop', 'modelFiles', 'modelThumbs', state.modelImages);
+
+const GEMINI_TEXT_MODEL = 'gemini-2.5-flash';
+const GEMINI_IMAGE_MODEL = 'gemini-2.5-flash-image';
+
+async function callGemini(model, contents, generationConfig, apiKey) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents, generationConfig })
+  });
+  const json = await res.json();
+  if (!res.ok) {
+    throw new Error(json.error?.message || `Gemini request failed (${res.status})`);
+  }
+  return json;
+}
+
+async function decideBraModelAndCopy(theme, braImages, modelImages, apiKey) {
+  const parts = [];
+  parts.push({ text:
+`You are the creative director for "Tweens", a tween/young-girls innerwear brand. Below are reference images: first the BRA photos (indexed from 0), then the MODEL photos (indexed from 0). For the campaign theme given, pick the single best bra and the single best model, and write tasteful, age-appropriate, upbeat ad copy for this theme.
+
+BRA_COUNT=${braImages.length}
+MODEL_COUNT=${modelImages.length}
+THEME: "${theme}"
+
+Respond with ONLY strict JSON, no markdown, matching this shape:
+{"braIndex": number, "modelIndex": number, "headline": "max 5 words", "subheading": "max 7 words", "cta": "max 3 words or empty string", "reasoning": "one sentence on why this bra+model fit the theme"}` });
+
+  braImages.forEach((img, i) => {
+    parts.push({ text: `BRA_IMAGE_INDEX_${i}` });
+    parts.push({ inlineData: { mimeType: img.mimeType, data: img.data } });
+  });
+  modelImages.forEach((img, i) => {
+    parts.push({ text: `MODEL_IMAGE_INDEX_${i}` });
+    parts.push({ inlineData: { mimeType: img.mimeType, data: img.data } });
+  });
+
+  const json = await callGemini(GEMINI_TEXT_MODEL, [{ role: 'user', parts }],
+    { responseMimeType: 'application/json' }, apiKey);
+
+  const text = json.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('') || '{}';
+  let parsed;
+  try { parsed = JSON.parse(text); } catch (e) { throw new Error('Could not parse AI decision: ' + text); }
+
+  parsed.braIndex = Math.min(Math.max(0, parsed.braIndex | 0), braImages.length - 1);
+  parsed.modelIndex = Math.min(Math.max(0, parsed.modelIndex | 0), modelImages.length - 1);
+  return parsed;
+}
+
+function buildImagePrompt(decision, theme, headlineColor, subColor, aspect) {
+  return `You are generating a professional fashion campaign image for TWEENS, a tween/young-girls innerwear brand.
+
+IMAGE REFERENCES:
+- Image 1 is the MODEL REFERENCE. Use it ONLY for: face structure, skin tone, hair color, hair texture, body type, and overall appearance. Do NOT copy any clothing, pose, or background from Image 1.
+- Image 2 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.
+
+POSE & BODY DIRECTION:
+- Model stands facing forward, relaxed, age-appropriate, friendly and confident posture, both arms visible at her sides.
+- Expression: soft, natural, warm smile.
+- Shot framed from shoulders to just below the bra band. Nothing below the waist.
+- Hair falls softly but directed AWAY from all bra straps, armhole edges, and bottom band. Zero hair overlap.
+- Skin completely tattoo-free and blemish-free, no jewellery unless already present in Image 1.
+
+PRODUCT VISIBILITY - CRITICAL NON-NEGOTIABLE:
+- The bra from Image 2 must be worn exactly - same color, fabric, fit, silhouette.
+- ALL of the following fully visible, unobstructed, sharply in focus: full front center panel, both shoulder straps top to bottom, full bottom band left to right, both armhole edges.
+- Primary lighting on the bra - it is the HERO product. No hands, hair, or arms overlapping any part of it.
+
+BACKGROUND & LIGHTING:
+- Soft, airy, light-filled indoor background in warm white or soft ivory/cream tones. Subtle soft-focus background elements allowed. Lighting soft, diffused, natural, warm golden-white. No dark shadows, no cold tones, no dramatic contrast.
+- Tone must stay wholesome, tasteful, and age-appropriate for a young/tween audience - no adult or suggestive framing.
+
+CAMPAIGN THEME: "${theme}"
+
+INFOGRAPHIC LAYOUT & TYPOGRAPHY (bake this text directly into the image):
+HEADLINE - Position: top-left of image
+  Text: "${decision.headline}"
+  Font style: bold, modern, rounded sans-serif, large size
+  Color: (${headlineColor})
+
+SUB-HEADING - Position: directly below headline
+  Text: "${decision.subheading}"
+  Font style: medium weight, modern sans-serif, slightly smaller than headline
+  Color: (${subColor})
+
+${decision.cta ? `CTA - Position: bottom-left corner
+  Text: "${decision.cta}"
+  Font style: bold, small pill/button shape background
+  Color: (${headlineColor})` : ''}
+
+OVERALL COMPOSITION:
+- Headline + sub-heading in the top-left quadrant. Model centered to center-right. Text must NOT overlap model's face or the bra.
+- Generous breathing space around all text elements. Final image balanced, airy, campaign-ready.
+- Aspect ratio: ${aspect}.
+
+TECHNICAL QUALITY:
+- Commercial fashion campaign quality, photorealistic, not illustrated, not stylised, sharp focus on the product.
+
+NEGATIVE INSTRUCTIONS:
+- Do NOT alter model's face, skin tone, hair color, or body from Image 1
+- Do NOT alter bra color, shape, texture, or silhouette from Image 2
+- Do NOT let hair fall over bra straps, armhole edges, or bottom band
+- Do NOT add tattoos, jewelry, piercings, or accessories not in Image 1
+- Do NOT use dark, moody, cold-toned, or suggestive backgrounds or lighting
+- Do NOT add watermarks, logos, or extra branding
+- Do NOT generate multiple models or background figures
+- Render all quoted text exactly as written, no spelling changes, no added or duplicate words.`;
+}
+
+async function generateImage(decision, braImg, modelImg, theme, headlineColor, subColor, aspect, apiKey) {
+  const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect);
+  const parts = [
+    { text: prompt },
+    { text: 'Image 1 (MODEL REFERENCE):' },
+    { inlineData: { mimeType: modelImg.mimeType, data: modelImg.data } },
+    { text: 'Image 2 (PRODUCT REFERENCE - the bra):' },
+    { inlineData: { mimeType: braImg.mimeType, data: braImg.data } }
+  ];
+  const json = await callGemini(GEMINI_IMAGE_MODEL, [{ role: 'user', parts }], {}, apiKey);
+  const imgPart = json.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+  if (!imgPart) {
+    const textPart = json.candidates?.[0]?.content?.parts?.find(p => p.text);
+    throw new Error('No image returned. ' + (textPart?.text || JSON.stringify(json).slice(0, 300)));
+  }
+  return `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
+}
+
+function addResultCard(theme, status) {
+  const results = $('results');
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.innerHTML = `
+    <div style="aspect-ratio:4/5; display:flex; align-items:center; justify-content:center; background:var(--panel-2); color:var(--muted); font-size:12px;">Generating&hellip;</div>
+    <div class="result-body">
+      <div class="theme">${theme}</div>
+      <div class="meta">${status}</div>
+    </div>`;
+  results.prepend(card);
+  return card;
+}
+
+function fillResultCard(card, imgDataUrl, decision, braName, modelName) {
+  card.querySelector('div').outerHTML = `<img src="${imgDataUrl}">`;
+  const meta = card.querySelector('.meta');
+  meta.innerHTML = `<span class="badge">Bra: ${braName}</span><span class="badge">Model: ${modelName}</span><br>${decision.reasoning || ''}`;
+  const actions = document.createElement('div');
+  actions.className = 'result-actions';
+  const a = document.createElement('a');
+  a.href = imgDataUrl;
+  a.download = `tweens-creative-${Date.now()}.png`;
+  a.className = 'btn secondary';
+  a.textContent = 'Download';
+  actions.appendChild(a);
+  card.appendChild(actions);
+}
+
+function failResultCard(card, err) {
+  card.querySelector('div').outerHTML = `<div style="aspect-ratio:4/5; display:flex; align-items:center; justify-content:center; background:var(--panel-2); color:var(--err); font-size:12px; padding:10px; text-align:center;">Failed</div>`;
+  const meta = card.querySelector('.meta');
+  meta.classList.add('error-box');
+  meta.textContent = err.message || String(err);
+}
+
+$('generateBtn').addEventListener('click', async () => {
+  const apiKey = apiKeyInput.value.trim();
+  const themes = $('themes').value.split('\n').map(t => t.trim()).filter(Boolean);
+  const headlineColor = $('headlineColor').value;
+  const subColor = $('subColor').value;
+  const aspect = $('aspect').value.trim() || '4:5 portrait';
+
+  if (!apiKey) { alert('Add your Gemini API key first.'); return; }
+  if (state.braImages.length === 0) { alert('Upload at least one bra photo.'); return; }
+  if (state.modelImages.length === 0) { alert('Upload at least one model photo.'); return; }
+  if (themes.length === 0) { alert('Add at least one campaign theme.'); return; }
+
+  const btn = $('generateBtn');
+  btn.disabled = true;
+  $('log').textContent = `Starting ${themes.length} campaign(s)...`;
+
+  for (const theme of themes) {
+    const card = addResultCard(theme, 'Choosing bra + model...');
+    try {
+      logLine(`[${theme}] asking AI to pick bra + model + copy...`);
+      const decision = await decideBraModelAndCopy(theme, state.braImages, state.modelImages, apiKey);
+      const bra = state.braImages[decision.braIndex];
+      const model = state.modelImages[decision.modelIndex];
+      logLine(`[${theme}] picked bra "${bra.name}" + model "${model.name}". Generating image...`);
+      const imgDataUrl = await generateImage(decision, bra, model, theme, headlineColor, subColor, aspect, apiKey);
+      fillResultCard(card, imgDataUrl, decision, bra.name, model.name);
+      logLine(`[${theme}] done.`);
+    } catch (err) {
+      failResultCard(card, err);
+      logLine(`[${theme}] ERROR: ${err.message || err}`);
+    }
+  }
+
+  btn.disabled = false;
+  logLine('All campaigns processed.');
+});
+</script>
+</body>
+</html>
