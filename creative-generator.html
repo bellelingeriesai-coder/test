@@ -127,10 +127,16 @@ Everyday comfort, no-elastic construction, feature callout"></textarea>
       Ultra-realistic mode (visible skin pores, natural texture, shot-on-Hasselblad look)
     </label>
 
+    <label>
+      <input type="checkbox" id="aiModelOnly" checked style="width:auto; vertical-align:middle; margin-right:6px;">
+      AI-generated model (skip the real photo, go straight to a similar-looking AI model &mdash; faster, avoids safety blocks)
+    </label>
+
     <label>Aspect ratio</label>
     <input type="text" id="aspect" value="4:5 portrait">
 
     <button class="btn" id="generateBtn">Generate creatives</button>
+    <button class="btn secondary" id="quickGenerateBtn" style="width:100%; margin-top:8px;">Don't want to type? Fill in ideas for me</button>
   </div>
 </div>
 
@@ -438,7 +444,16 @@ async function requestGeminiImage(prompt, imageParts, apiKey) {
   return `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
 }
 
-async function generateImage(decision, braImg, modelImg, theme, headlineColor, subColor, aspect, hyperReal, apiKey) {
+async function generateImage(decision, braImg, modelImg, theme, headlineColor, subColor, aspect, hyperReal, aiModelOnly, apiKey) {
+  if (aiModelOnly) {
+    const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, true);
+    const url = await requestGeminiImage(prompt, [
+      { text: 'Image 1 (PRODUCT REFERENCE - the bra):' },
+      { inlineData: { mimeType: braImg.mimeType, data: braImg.data } }
+    ], apiKey);
+    return { url, usedFallback: true };
+  }
+
   const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, false);
   try {
     const url = await requestGeminiImage(prompt, [
@@ -509,6 +524,7 @@ $('generateBtn').addEventListener('click', async () => {
   const subColor = $('subColor').value;
   const aspect = $('aspect').value.trim() || '4:5 portrait';
   const hyperReal = $('hyperReal').checked;
+  const aiModelOnly = $('aiModelOnly').checked;
 
   if (themes.length === 0 && state.sheetRows.length > 0) {
     themes = themesFromSheetRows(state.sheetRows);
@@ -531,7 +547,7 @@ $('generateBtn').addEventListener('click', async () => {
       const bra = state.braImages[decision.braIndex];
       const model = state.modelImages[decision.modelIndex];
       logLine(`[${theme}] picked bra "${bra.name}" + model "${model.name}". Generating image...`);
-      const { url: imgDataUrl, usedFallback } = await generateImage(decision, bra, model, theme, headlineColor, subColor, aspect, hyperReal, apiKey);
+      const { url: imgDataUrl, usedFallback } = await generateImage(decision, bra, model, theme, headlineColor, subColor, aspect, hyperReal, aiModelOnly, apiKey);
       fillResultCard(card, imgDataUrl, decision, bra.name, model.name, usedFallback);
       logLine(`[${theme}] done.${usedFallback ? ' (used AI-generated model - photo reference was blocked by safety filters)' : ''}`);
     } catch (err) {
@@ -542,6 +558,25 @@ $('generateBtn').addEventListener('click', async () => {
 
   btn.disabled = false;
   logLine('All campaigns processed.');
+});
+
+const PRESET_THEMES = [
+  'Golden hour rooftop, candid laughing pose, Gen-Z confident energy, warm urban skyline blurred behind her',
+  'Minimal studio, one arm relaxed one hand in hair, soft beige backdrop, editorial calm-confident mood',
+  'Dorm room aesthetic, sitting on bed cross-legged, fairy lights and posters blurred behind, cozy candid vibe',
+  'Street style, walking mid-stride caught candid, graffiti wall background, effortless cool energy',
+  'Balcony at sunset, leaning on railing, wind in hair, dreamy warm-toned city backdrop',
+  'Y2K-inspired pastel set, playful hand-on-hip pose, colorful gradient backdrop, fun and bold',
+  'Cafe window seat, candid laugh mid-conversation looking off-frame, soft natural daylight, relatable everyday moment'
+];
+
+$('quickGenerateBtn').addEventListener('click', () => {
+  if (!$('themes').value.trim()) {
+    const count = 3 + Math.floor(Math.random() * 3);
+    const shuffled = [...PRESET_THEMES].sort(() => Math.random() - 0.5).slice(0, count);
+    $('themes').value = shuffled.join('\n');
+  }
+  $('generateBtn').click();
 });
 </script>
 </body>
