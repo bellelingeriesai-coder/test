@@ -131,6 +131,7 @@ Everyday comfort, no-elastic construction, feature callout"></textarea>
       <input type="checkbox" id="aiModelOnly" checked style="width:auto; vertical-align:middle; margin-right:6px;">
       AI-generated model (skip the real photo, go straight to a similar-looking AI model &mdash; faster, avoids safety blocks)
     </label>
+    <div class="hint">The first time each model is used, one fixed AI portrait is generated and then reused for every creative, so the same AI model appears consistently across the whole batch. <a href="#" id="resetPortraits" style="color:var(--accent);">Reset AI models</a> to regenerate fresh ones.</div>
 
     <label>Aspect ratio</label>
     <input type="text" id="aspect" value="4:5 portrait">
@@ -144,7 +145,7 @@ Everyday comfort, no-elastic construction, feature callout"></textarea>
 <div class="results" id="results"></div>
 
 <script>
-const state = { braImages: [], modelImages: [], sheetRows: [] };
+const state = { braImages: [], modelImages: [], sheetRows: [], aiPortraits: {} };
 
 const $ = id => document.getElementById(id);
 const apiKeyInput = $('apiKey');
@@ -358,7 +359,7 @@ Respond with ONLY strict JSON, no markdown, matching this shape:
   return parsed;
 }
 
-function buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, useDescriptionOnly) {
+function buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, useDescriptionOnly, isAiPortrait) {
   const realismBlock = hyperReal ? `
 
 HYPER-REALISM (critical):
@@ -371,6 +372,10 @@ HYPER-REALISM (critical):
     ? `IMAGE REFERENCES:
 - There is no model photo reference. Generate a fictional adult woman model matching this description: ${decision.modelDescription || 'adult woman, natural build, warm expression'}.
 - Image 1 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.`
+    : isAiPortrait
+    ? `IMAGE REFERENCES:
+- Image 1 is the MODEL REFERENCE - a fictional AI-generated model who does not represent any real person. Match her face structure, skin tone, hair color, hair texture, and body type EXACTLY as shown, so this same model stays visually consistent and recognizable across every creative in this campaign. Do NOT copy her clothing, pose, or background from Image 1.
+- Image 2 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.`
     : `IMAGE REFERENCES:
 - Image 1 is the MODEL REFERENCE. Use it ONLY for: face structure, skin tone, hair color, hair texture, body type, and overall appearance. Do NOT copy any clothing, pose, or background from Image 1.
 - Image 2 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.`;
@@ -444,17 +449,39 @@ async function requestGeminiImage(prompt, imageParts, apiKey) {
   return `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
 }
 
+async function ensureAiPortrait(modelIndex, description, apiKey) {
+  if (state.aiPortraits[modelIndex]) return state.aiPortraits[modelIndex];
+  const prompt = `Generate a clean professional studio headshot (shoulders-up) of a fictional adult woman fashion model. She does not represent any real person. Appearance: ${description || 'adult woman, natural build, warm friendly expression'}. Plain neutral light-grey seamless background, soft even studio lighting, front-facing, relaxed natural expression, wearing a simple plain top (not underwear). Photorealistic, sharp focus, high-quality fashion headshot, consistent and reproducible look.`;
+  const url = await requestGeminiImage(prompt, [], apiKey);
+  const match = url.match(/^data:([^;]+);base64,(.+)$/);
+  const portrait = { mimeType: match[1], data: match[2] };
+  state.aiPortraits[modelIndex] = portrait;
+  return portrait;
+}
+
 async function generateImage(decision, braImg, modelImg, theme, headlineColor, subColor, aspect, hyperReal, aiModelOnly, apiKey) {
   if (aiModelOnly) {
-    const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, true);
-    const url = await requestGeminiImage(prompt, [
-      { text: 'Image 1 (PRODUCT REFERENCE - the bra):' },
-      { inlineData: { mimeType: braImg.mimeType, data: braImg.data } }
-    ], apiKey);
-    return { url, usedFallback: true };
+    try {
+      const portrait = await ensureAiPortrait(decision.modelIndex, decision.modelDescription, apiKey);
+      const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, false, true);
+      const url = await requestGeminiImage(prompt, [
+        { text: 'Image 1 (MODEL REFERENCE - fictional AI model, keep consistent):' },
+        { inlineData: { mimeType: portrait.mimeType, data: portrait.data } },
+        { text: 'Image 2 (PRODUCT REFERENCE - the bra):' },
+        { inlineData: { mimeType: braImg.mimeType, data: braImg.data } }
+      ], apiKey);
+      return { url, usedFallback: true };
+    } catch (err) {
+      const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, true);
+      const url = await requestGeminiImage(prompt, [
+        { text: 'Image 1 (PRODUCT REFERENCE - the bra):' },
+        { inlineData: { mimeType: braImg.mimeType, data: braImg.data } }
+      ], apiKey);
+      return { url, usedFallback: true };
+    }
   }
 
-  const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, false);
+  const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, false, false);
   try {
     const url = await requestGeminiImage(prompt, [
       { text: 'Image 1 (MODEL REFERENCE):' },
@@ -577,6 +604,12 @@ $('quickGenerateBtn').addEventListener('click', () => {
     $('themes').value = shuffled.join('\n');
   }
   $('generateBtn').click();
+});
+
+$('resetPortraits').addEventListener('click', (e) => {
+  e.preventDefault();
+  state.aiPortraits = {};
+  logLine('AI model portraits reset - the next generation will create fresh ones and reuse them from then on.');
 });
 </script>
 </body>
