@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tweens AI Creative Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --bg:#120c10; --panel:#1c1518; --panel-2:#231a1e; --border:#3a2c30;
@@ -89,6 +90,16 @@
     <div class="dropzone" id="modelDrop">Click or drop model reference photos here</div>
     <input type="file" id="modelFiles" class="file-input" accept="image/*" multiple>
     <div class="thumbs" id="modelThumbs"></div>
+
+    <label>Or: bulk-upload everything at once &mdash; AI sorts bra vs. model</label>
+    <div class="dropzone" id="bulkDrop">Click or drop ALL bra + model photos here (mixed, any order)</div>
+    <input type="file" id="bulkFiles" class="file-input" accept="image/*" multiple>
+    <div class="hint" id="bulkStatus"></div>
+
+    <label>Raw data spreadsheet (CSV / XLSX) &mdash; optional</label>
+    <div class="dropzone" id="sheetDrop">Click or drop your product/campaign spreadsheet here</div>
+    <input type="file" id="sheetFile" class="file-input" accept=".csv,.xlsx,.xls">
+    <div class="hint" id="sheetStatus">If provided, each row grounds the AI's bra choice (color/style/price/etc.) and, if you leave the theme box empty, each row becomes its own campaign.</div>
   </div>
 
   <div class="card">
@@ -111,6 +122,11 @@ Everyday comfort, no-elastic construction, feature callout"></textarea>
       </div>
     </div>
 
+    <label>
+      <input type="checkbox" id="hyperReal" checked style="width:auto; vertical-align:middle; margin-right:6px;">
+      Ultra-realistic mode (visible skin pores, natural texture, shot-on-Hasselblad look)
+    </label>
+
     <label>Aspect ratio</label>
     <input type="text" id="aspect" value="4:5 portrait">
 
@@ -122,7 +138,7 @@ Everyday comfort, no-elastic construction, feature callout"></textarea>
 <div class="results" id="results"></div>
 
 <script>
-const state = { braImages: [], modelImages: [] };
+const state = { braImages: [], modelImages: [], sheetRows: [] };
 
 const $ = id => document.getElementById(id);
 const apiKeyInput = $('apiKey');
@@ -181,6 +197,64 @@ function renderThumb(item, list, thumbsEl) {
 setupUploader('braDrop', 'braFiles', 'braThumbs', state.braImages);
 setupUploader('modelDrop', 'modelFiles', 'modelThumbs', state.modelImages);
 
+const bulkDrop = $('bulkDrop'), bulkInput = $('bulkFiles'), bulkStatus = $('bulkStatus');
+bulkDrop.addEventListener('click', () => bulkInput.click());
+bulkDrop.addEventListener('dragover', e => { e.preventDefault(); bulkDrop.style.borderColor = 'var(--accent)'; });
+bulkDrop.addEventListener('dragleave', () => { bulkDrop.style.borderColor = 'var(--border)'; });
+bulkDrop.addEventListener('drop', e => { e.preventDefault(); bulkDrop.style.borderColor = 'var(--border)'; sortBulkFiles(e.dataTransfer.files); });
+bulkInput.addEventListener('change', () => sortBulkFiles(bulkInput.files));
+
+async function sortBulkFiles(fileList) {
+  const apiKey = apiKeyInput.value.trim();
+  if (!apiKey) { alert('Add your Gemini API key first, then bulk-upload.'); return; }
+  const files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
+  if (files.length === 0) return;
+  bulkStatus.textContent = `Reading ${files.length} photo(s)...`;
+  const items = [];
+  for (const file of files) {
+    const b64 = await fileToBase64(file);
+    items.push({ name: file.name, mimeType: file.type, data: b64 });
+  }
+  bulkStatus.textContent = `Asking AI to sort ${items.length} photo(s) into bra vs. model...`;
+  try {
+    const classifications = await classifyBulkImages(items, apiKey);
+    let braCount = 0, modelCount = 0;
+    items.forEach((item, i) => {
+      const cls = classifications.find(c => c.index === i);
+      if (cls && cls.type === 'model') {
+        state.modelImages.push(item);
+        renderThumb(item, state.modelImages, $('modelThumbs'));
+        modelCount++;
+      } else {
+        state.braImages.push(item);
+        renderThumb(item, state.braImages, $('braThumbs'));
+        braCount++;
+      }
+    });
+    bulkStatus.textContent = `Sorted: ${braCount} bra photo(s), ${modelCount} model photo(s).`;
+  } catch (err) {
+    bulkStatus.textContent = 'Sort failed: ' + (err.message || err);
+  }
+}
+
+const sheetDrop = $('sheetDrop'), sheetInput = $('sheetFile'), sheetStatus = $('sheetStatus');
+sheetDrop.addEventListener('click', () => sheetInput.click());
+sheetDrop.addEventListener('dragover', e => { e.preventDefault(); sheetDrop.style.borderColor = 'var(--accent)'; });
+sheetDrop.addEventListener('dragleave', () => { sheetDrop.style.borderColor = 'var(--border)'; });
+sheetDrop.addEventListener('drop', e => { e.preventDefault(); sheetDrop.style.borderColor = 'var(--border)'; loadSheet(e.dataTransfer.files[0]); });
+sheetInput.addEventListener('change', () => loadSheet(sheetInput.files[0]));
+
+async function loadSheet(file) {
+  if (!file) return;
+  try {
+    const rows = await parseSpreadsheet(file);
+    state.sheetRows = rows;
+    sheetStatus.textContent = `Loaded ${rows.length} row(s) from "${file.name}". They'll ground bra choices, and fill in as campaign themes if the theme box is left empty.`;
+  } catch (err) {
+    sheetStatus.textContent = 'Could not read spreadsheet: ' + (err.message || err);
+  }
+}
+
 const GEMINI_TEXT_MODEL = 'gemini-2.5-flash';
 const GEMINI_IMAGE_MODEL = 'gemini-2.5-flash-image';
 
@@ -198,17 +272,62 @@ async function callGemini(model, contents, generationConfig, apiKey) {
   return json;
 }
 
-async function decideBraModelAndCopy(theme, braImages, modelImages, apiKey) {
+async function classifyBulkImages(items, apiKey) {
   const parts = [];
   parts.push({ text:
-`You are the creative director for "Tweens", a tween/young-girls innerwear brand. Below are reference images: first the BRA photos (indexed from 0), then the MODEL photos (indexed from 0). For the campaign theme given, pick the single best bra and the single best model, and write tasteful, age-appropriate, upbeat ad copy for this theme.
+`You are sorting a mixed batch of photos for "Tweens", a tween/young-girls innerwear brand, before an ad campaign is built from them.
+
+For each IMAGE_INDEX below, classify it as exactly one of:
+- "bra": a product-only or flat-lay/hanger shot of a bra with no person wearing it as the subject
+- "model": a photo of a person (the human model reference) who will wear a bra in the generated creative
+
+IMAGE_COUNT=${items.length}
+
+Respond with ONLY strict JSON, no markdown: {"classifications": [{"index": number, "type": "bra" | "model"}, ...]} covering every index from 0 to ${items.length - 1}.` });
+
+  items.forEach((img, i) => {
+    parts.push({ text: `IMAGE_INDEX_${i}` });
+    parts.push({ inlineData: { mimeType: img.mimeType, data: img.data } });
+  });
+
+  const json = await callGemini(GEMINI_TEXT_MODEL, [{ role: 'user', parts }],
+    { responseMimeType: 'application/json' }, apiKey);
+  const text = json.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('') || '{}';
+  let parsed;
+  try { parsed = JSON.parse(text); } catch (e) { throw new Error('Could not parse AI sort result: ' + text); }
+  return parsed.classifications || [];
+}
+
+function parseSpreadsheet(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const wb = XLSX.read(reader.result, { type: 'array' });
+        const firstSheet = wb.SheetNames[0];
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[firstSheet], { defval: '' });
+        resolve(rows);
+      } catch (e) { reject(e); }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+async function decideBraModelAndCopy(theme, braImages, modelImages, sheetRows, apiKey) {
+  const parts = [];
+  const sheetContext = sheetRows && sheetRows.length
+    ? `\n\nRAW PRODUCT/CAMPAIGN DATA (from uploaded spreadsheet, use it to ground your bra choice in real attributes like color/style/price/size where relevant):\n${JSON.stringify(sheetRows.slice(0, 200))}`
+    : '';
+  parts.push({ text:
+`You are the creative director for "Tweens", a tween/young-girls innerwear brand. Below are reference images: first the BRA photos (indexed from 0), then the MODEL photos (indexed from 0). For the campaign theme given, pick the single bra and the single model that together fit the Tweens brand identity and this theme best, and write tasteful, age-appropriate, upbeat ad copy for this theme.
 
 BRA_COUNT=${braImages.length}
 MODEL_COUNT=${modelImages.length}
-THEME: "${theme}"
+THEME: "${theme}"${sheetContext}
 
 Respond with ONLY strict JSON, no markdown, matching this shape:
-{"braIndex": number, "modelIndex": number, "headline": "max 5 words", "subheading": "max 7 words", "cta": "max 3 words or empty string", "reasoning": "one sentence on why this bra+model fit the theme"}` });
+{"braIndex": number, "modelIndex": number, "headline": "max 5 words", "subheading": "max 7 words", "cta": "max 3 words or empty string", "reasoning": "one sentence on why this bra+model fit the theme and the Tweens brand"}` });
 
   braImages.forEach((img, i) => {
     parts.push({ text: `BRA_IMAGE_INDEX_${i}` });
@@ -231,8 +350,16 @@ Respond with ONLY strict JSON, no markdown, matching this shape:
   return parsed;
 }
 
-function buildImagePrompt(decision, theme, headlineColor, subColor, aspect) {
-  return `You are generating a professional fashion campaign image for TWEENS, a tween/young-girls innerwear brand.
+function buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal) {
+  const realismBlock = hyperReal ? `
+
+HYPER-REALISM (critical):
+- Skin must show authentic, unretouched human detail: visible fine pores, natural micro-texture, subtle color variation, faint peach fuzz/vellus hair catching the light. NOT airbrushed, NOT plastic-smooth, NOT CGI-looking.
+- Render as if shot on a Hasselblad medium-format camera (e.g. H6D-100c) with an 80mm portrait lens, f/4-f/5.6, on-location studio strobes with a large soft box key light and gentle fill - crisp micro-contrast, tack-sharp focus on skin and fabric texture, natural falloff, true-to-life color science.
+- Fabric of the bra must show real woven/knit texture, individual thread detail, and natural fabric sheen - not flat or illustrated.
+- Output should be indistinguishable from an unretouched RAW professional photograph, high dynamic range, no plastic skin, no over-smoothing, no beauty-filter look.` : '';
+
+  return `You are generating a professional fashion campaign image for TWEENS, a tween/young-girls innerwear brand.${realismBlock}
 
 IMAGE REFERENCES:
 - Image 1 is the MODEL REFERENCE. Use it ONLY for: face structure, skin tone, hair color, hair texture, body type, and overall appearance. Do NOT copy any clothing, pose, or background from Image 1.
@@ -278,7 +405,7 @@ OVERALL COMPOSITION:
 - Aspect ratio: ${aspect}.
 
 TECHNICAL QUALITY:
-- Commercial fashion campaign quality, photorealistic, not illustrated, not stylised, sharp focus on the product.
+- Commercial fashion campaign quality, photorealistic, not illustrated, not stylised, sharp focus on the product.${hyperReal ? ' Shot on a Hasselblad medium-format camera, 80mm lens, professional studio lighting, with true human skin texture including visible pores - not smoothed or plastic.' : ''}
 
 NEGATIVE INSTRUCTIONS:
 - Do NOT alter model's face, skin tone, hair color, or body from Image 1
@@ -291,8 +418,8 @@ NEGATIVE INSTRUCTIONS:
 - Render all quoted text exactly as written, no spelling changes, no added or duplicate words.`;
 }
 
-async function generateImage(decision, braImg, modelImg, theme, headlineColor, subColor, aspect, apiKey) {
-  const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect);
+async function generateImage(decision, braImg, modelImg, theme, headlineColor, subColor, aspect, hyperReal, apiKey) {
+  const prompt = buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal);
   const parts = [
     { text: prompt },
     { text: 'Image 1 (MODEL REFERENCE):' },
@@ -345,17 +472,26 @@ function failResultCard(card, err) {
   meta.textContent = err.message || String(err);
 }
 
+function themesFromSheetRows(rows) {
+  return rows.map(row => Object.entries(row).map(([k, v]) => `${k}: ${v}`).join(', ')).filter(Boolean);
+}
+
 $('generateBtn').addEventListener('click', async () => {
   const apiKey = apiKeyInput.value.trim();
-  const themes = $('themes').value.split('\n').map(t => t.trim()).filter(Boolean);
+  let themes = $('themes').value.split('\n').map(t => t.trim()).filter(Boolean);
   const headlineColor = $('headlineColor').value;
   const subColor = $('subColor').value;
   const aspect = $('aspect').value.trim() || '4:5 portrait';
+  const hyperReal = $('hyperReal').checked;
+
+  if (themes.length === 0 && state.sheetRows.length > 0) {
+    themes = themesFromSheetRows(state.sheetRows);
+  }
 
   if (!apiKey) { alert('Add your Gemini API key first.'); return; }
   if (state.braImages.length === 0) { alert('Upload at least one bra photo.'); return; }
   if (state.modelImages.length === 0) { alert('Upload at least one model photo.'); return; }
-  if (themes.length === 0) { alert('Add at least one campaign theme.'); return; }
+  if (themes.length === 0) { alert('Add at least one campaign theme, or upload a spreadsheet with campaign rows.'); return; }
 
   const btn = $('generateBtn');
   btn.disabled = true;
@@ -365,11 +501,11 @@ $('generateBtn').addEventListener('click', async () => {
     const card = addResultCard(theme, 'Choosing bra + model...');
     try {
       logLine(`[${theme}] asking AI to pick bra + model + copy...`);
-      const decision = await decideBraModelAndCopy(theme, state.braImages, state.modelImages, apiKey);
+      const decision = await decideBraModelAndCopy(theme, state.braImages, state.modelImages, state.sheetRows, apiKey);
       const bra = state.braImages[decision.braIndex];
       const model = state.modelImages[decision.modelIndex];
       logLine(`[${theme}] picked bra "${bra.name}" + model "${model.name}". Generating image...`);
-      const imgDataUrl = await generateImage(decision, bra, model, theme, headlineColor, subColor, aspect, apiKey);
+      const imgDataUrl = await generateImage(decision, bra, model, theme, headlineColor, subColor, aspect, hyperReal, apiKey);
       fillResultCard(card, imgDataUrl, decision, bra.name, model.name);
       logLine(`[${theme}] done.`);
     } catch (err) {
