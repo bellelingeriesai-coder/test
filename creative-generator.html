@@ -128,10 +128,10 @@ Everyday comfort, no-elastic construction, feature callout"></textarea>
     </label>
 
     <label>
-      <input type="checkbox" id="aiModelOnly" checked style="width:auto; vertical-align:middle; margin-right:6px;">
-      AI-generated model (skip the real photo, go straight to a similar-looking AI model &mdash; faster, avoids safety blocks)
+      <input type="checkbox" id="aiModelOnly" style="width:auto; vertical-align:middle; margin-right:6px;">
+      Use an AI stand-in model instead of my real photos (only if your real model keeps getting blocked)
     </label>
-    <div class="hint">The first time each model is used, one fixed AI portrait is generated and then reused for every creative, so the same AI model appears consistently across the whole batch. <a href="#" id="resetPortraits" style="color:var(--accent);">Reset AI models</a> to regenerate fresh ones.</div>
+    <div class="hint">By default the tool uses YOUR uploaded model photo. If Gemini blocks a specific generation, it automatically retries with an AI stand-in for that one image only, flagged with a badge &mdash; it will never silently swap your real model for a different-looking one otherwise. Check the box above only if you'd rather skip straight to the AI stand-in for every image. <a href="#" id="resetPortraits" style="color:var(--accent);">Reset AI models</a> if you've used the stand-in and want a fresh one.</div>
 
     <label>Aspect ratio</label>
     <input type="text" id="aspect" value="4:5 portrait">
