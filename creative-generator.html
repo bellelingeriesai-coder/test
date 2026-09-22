@@ -275,7 +275,7 @@ async function callGemini(model, contents, generationConfig, apiKey) {
 async function classifyBulkImages(items, apiKey) {
   const parts = [];
   parts.push({ text:
-`You are sorting a mixed batch of photos for "Tweens", a tween/young-girls innerwear brand, before an ad campaign is built from them.
+`You are sorting a mixed batch of photos for "Tweens", a women's innerwear brand, before an ad campaign is built from them. All models are adults.
 
 For each IMAGE_INDEX below, classify it as exactly one of:
 - "bra": a product-only or flat-lay/hanger shot of a bra with no person wearing it as the subject
@@ -320,7 +320,7 @@ async function decideBraModelAndCopy(theme, braImages, modelImages, sheetRows, a
     ? `\n\nRAW PRODUCT/CAMPAIGN DATA (from uploaded spreadsheet, use it to ground your bra choice in real attributes like color/style/price/size where relevant):\n${JSON.stringify(sheetRows.slice(0, 200))}`
     : '';
   parts.push({ text:
-`You are the creative director for "Tweens", a tween/young-girls innerwear brand. Below are reference images: first the BRA photos (indexed from 0), then the MODEL photos (indexed from 0). For the campaign theme given, pick the single bra and the single model that together fit the Tweens brand identity and this theme best, and write tasteful, age-appropriate, upbeat ad copy for this theme.
+`You are the creative director for "Tweens", a women's innerwear brand. All models shown are adults. Below are reference images: first the BRA photos (indexed from 0), then the MODEL photos (indexed from 0). For the campaign theme given, pick the single bra and the single model that together fit the Tweens brand identity and this theme best, and write tasteful, upbeat ad copy for this theme.
 
 BRA_COUNT=${braImages.length}
 MODEL_COUNT=${modelImages.length}
@@ -359,14 +359,14 @@ HYPER-REALISM (critical):
 - Fabric of the bra must show real woven/knit texture, individual thread detail, and natural fabric sheen - not flat or illustrated.
 - Output should be indistinguishable from an unretouched RAW professional photograph, high dynamic range, no plastic skin, no over-smoothing, no beauty-filter look.` : '';
 
-  return `You are generating a professional fashion campaign image for TWEENS, a tween/young-girls innerwear brand.${realismBlock}
+  return `You are generating a professional fashion campaign image for TWEENS, a women's innerwear brand. The model is an adult woman.${realismBlock}
 
 IMAGE REFERENCES:
 - Image 1 is the MODEL REFERENCE. Use it ONLY for: face structure, skin tone, hair color, hair texture, body type, and overall appearance. Do NOT copy any clothing, pose, or background from Image 1.
 - Image 2 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.
 
 POSE & BODY DIRECTION:
-- Model stands facing forward, relaxed, age-appropriate, friendly and confident posture, both arms visible at her sides.
+- Model stands facing forward, relaxed, friendly and confident posture, both arms visible at her sides.
 - Expression: soft, natural, warm smile.
 - Shot framed from shoulders to just below the bra band. Nothing below the waist.
 - Hair falls softly but directed AWAY from all bra straps, armhole edges, and bottom band. Zero hair overlap.
@@ -379,7 +379,7 @@ PRODUCT VISIBILITY - CRITICAL NON-NEGOTIABLE:
 
 BACKGROUND & LIGHTING:
 - Soft, airy, light-filled indoor background in warm white or soft ivory/cream tones. Subtle soft-focus background elements allowed. Lighting soft, diffused, natural, warm golden-white. No dark shadows, no cold tones, no dramatic contrast.
-- Tone must stay wholesome, tasteful, and age-appropriate for a young/tween audience - no adult or suggestive framing.
+- Tone must stay wholesome, tasteful, and commercial - no suggestive framing.
 
 CAMPAIGN THEME: "${theme}"
 
