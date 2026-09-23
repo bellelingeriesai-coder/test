@@ -109,7 +109,11 @@
 Back to school sale, fun and confident, 20% off
 Festive collection launch, soft pastel colors, first bra comfort
 Everyday comfort, no-elastic construction, feature callout"></textarea>
-    <div class="hint">Each line becomes one generated creative. AI reads all bra + model photos and picks the best match per line.</div>
+    <div class="hint">Each line becomes one generated creative. AI reads all bra + model photos and picks the best match per line. Leave empty if you uploaded a spreadsheet &mdash; each row becomes its own campaign automatically.</div>
+
+    <label>Style direction (optional) &mdash; applies to every image, on top of each theme/row</label>
+    <textarea id="styleDirection" style="min-height:50px;" placeholder="e.g. cozy warm bedroom morning-after realism, golden-hour lamp light meeting cool window light, intimate close editorial mood"></textarea>
+    <div class="hint">Use this to lock in one consistent visual mood/setting across the whole batch, so you don't have to repeat it in every theme or spreadsheet row.</div>
 
     <div class="row2">
       <div>
@@ -321,22 +325,27 @@ function parseSpreadsheet(file) {
   });
 }
 
-async function decideBraModelAndCopy(theme, braImages, modelImages, sheetRows, apiKey) {
+async function decideBraModelAndCopy(theme, braImages, modelImages, sheetRows, styleDirection, apiKey) {
   const parts = [];
   const sheetContext = sheetRows && sheetRows.length
     ? `\n\nRAW PRODUCT/CAMPAIGN DATA (from uploaded spreadsheet, use it to ground your bra choice in real attributes like color/style/price/size where relevant):\n${JSON.stringify(sheetRows.slice(0, 200))}`
     : '';
+  const styleContext = styleDirection ? `\n\nSTYLE DIRECTION (apply to scene/pose choices below, consistent across the whole campaign): ${styleDirection}` : '';
   parts.push({ text:
-`You are the creative director for "Tweens", a women's innerwear brand. All models shown are adults. Below are reference images: first the BRA photos (indexed from 0), then the MODEL photos (indexed from 0). For the campaign theme given, pick the single bra and the single model that together fit the Tweens brand identity and this theme best, and write tasteful, upbeat ad copy for this theme.
+`You are the creative director AND senior direct-response copywriter for "Tweens", a women's innerwear brand. All models shown are adults. Below are reference images: first the BRA photos (indexed from 0), then the MODEL photos (indexed from 0). For the campaign theme given, pick the single bra and the single model that together fit the Tweens brand identity and this theme best.
+
+Also direct the shot: write one sentence describing a specific, editorial, candid SCENE/setting (location, props, light sources) that fits the theme, and one sentence describing a specific candid POSE and expression (not a stiff catalog pose - an unguarded, caught-in-a-moment feel).
+
+Then write the on-image copy like a scroll-stopping ad, not a product label. Use a proven two-line hook structure: line 1 is a short, punchy, curiosity-or-attitude-driven HOOK (bold claim, sensory language, or a pattern interrupt - think "WORE IT ALL NIGHT" energy, max 4 words so it fits on one line); line 2 is a smaller PAYOFF line that lands the benefit or twist (max 5 words, e.g. "FELT NOTHING"). Avoid generic phrases like "shop now" or "new collection" unless the theme is literally a sale.
 
 Also write a short neutral appearance description of the chosen model (build, approximate age range like "mid-20s", hair length/color/texture, skin tone) that could stand in for her photo if needed - describe her as a generic person, not by name or any identifying detail.
 
 BRA_COUNT=${braImages.length}
 MODEL_COUNT=${modelImages.length}
-THEME: "${theme}"${sheetContext}
+THEME: "${theme}"${styleContext}${sheetContext}
 
 Respond with ONLY strict JSON, no markdown, matching this shape:
-{"braIndex": number, "modelIndex": number, "headline": "max 5 words", "subheading": "max 7 words", "cta": "max 3 words or empty string", "reasoning": "one sentence on why this bra+model fit the theme and the Tweens brand", "modelDescription": "one sentence neutral appearance description"}` });
+{"braIndex": number, "modelIndex": number, "scene": "one sentence, specific and editorial", "pose": "one sentence, specific and candid", "hook": "max 4 words, bold punchy line 1", "payoff": "max 5 words, smaller line 2", "cta": "max 3 words or empty string", "reasoning": "one sentence on why this bra+model fit the theme and the Tweens brand", "modelDescription": "one sentence neutral appearance description"}` });
 
   braImages.forEach((img, i) => {
     parts.push({ text: `BRA_IMAGE_INDEX_${i}` });
@@ -360,13 +369,26 @@ Respond with ONLY strict JSON, no markdown, matching this shape:
 }
 
 function buildImagePrompt(decision, theme, headlineColor, subColor, aspect, hyperReal, useDescriptionOnly, isAiPortrait) {
+  const scene = decision.scene || 'A softly lit, warm-toned editorial interior setting fitting the campaign theme.';
+  const pose = decision.pose || 'A relaxed, candid, unguarded pose and expression - caught in a natural moment, not posing for the camera.';
+
   const realismBlock = hyperReal ? `
 
-HYPER-REALISM (critical):
-- Skin must show authentic, unretouched human detail: visible fine pores, natural micro-texture, subtle color variation, faint peach fuzz/vellus hair catching the light. NOT airbrushed, NOT plastic-smooth, NOT CGI-looking.
-- Render as if shot on a Hasselblad medium-format camera (e.g. H6D-100c) with an 80mm portrait lens, f/4-f/5.6, on-location studio strobes with a large soft box key light and gentle fill - crisp micro-contrast, tack-sharp focus on skin and fabric texture, natural falloff, true-to-life color science.
-- Fabric of the bra must show real woven/knit texture, individual thread detail, and natural fabric sheen - not flat or illustrated.
-- Output should be indistinguishable from an unretouched RAW professional photograph, high dynamic range, no plastic skin, no over-smoothing, no beauty-filter look.` : '';
+REALISM (critical, non-negotiable):
+- Subsurface skin scattering, individual vellus hair catching the light, natural iris texture, individual lash separation, natural facial asymmetry, fabric-weave physics with visible skin-to-fabric compression where the bra sits against skin.
+- Skin shows authentic, unretouched human detail: visible fine pores, subtle natural color variation, a faint natural flush where appropriate to the scene. NOT airbrushed, NOT plastic-smooth, NOT CGI-looking, NOT a beauty-filter look.
+- Two believable light temperatures should meet naturally across the frame (e.g. a warm practical light source on one side, a cooler ambient/window light on the other) rather than one flat, single-temperature wash.
+- Hair falls naturally with individual strand separation in the light, never a sealed/helmet silhouette.
+- Fabric of the bra shows real woven/knit texture, individual thread detail, and natural fabric sheen - not flat or illustrated.
+
+CAMERA:
+- Shot as if captured on a Hasselblad medium-format camera with a premium prime portrait lens - extremely high resolution, pore-level skin micro-texture, creamy shallow depth-of-field falloff on the background, rich tonal gradation, true-to-life color depth.
+- Premium editorial campaign photograph quality, not a flat smartphone snapshot or generic e-commerce catalog look.
+
+COLOR GRADING:
+- A warm, intentional cinematic grade across the frame, not a neutral flat white balance - real contrast between warmer and cooler zones of light, true blacks in the deepest shadows, clean controlled highlights.
+- The bra's color reads fully saturated and vivid - the clear color anchor of the shot.
+- Skin has a healthy, glossy, just-retouched sheen layered on top of the pore-level texture - elevated editorial polish, not a raw candid snapshot and not overexposed or over-lit.` : '';
 
   const imageReferences = useDescriptionOnly
     ? `IMAGE REFERENCES:
@@ -377,64 +399,58 @@ HYPER-REALISM (critical):
 - Image 1 is the MODEL REFERENCE - a fictional AI-generated model who does not represent any real person. Match her face structure, skin tone, hair color, hair texture, and body type EXACTLY as shown, so this same model stays visually consistent and recognizable across every creative in this campaign. Do NOT copy her clothing, pose, or background from Image 1.
 - Image 2 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.`
     : `IMAGE REFERENCES:
-- Image 1 is the MODEL REFERENCE. Use it ONLY for: face structure, skin tone, hair color, hair texture, body type, and overall appearance. Do NOT copy any clothing, pose, or background from Image 1.
+- Image 1 is the MODEL REFERENCE. Match her face structure, skin tone, hair color, hair texture, hairstyle, and body type EXACTLY as shown in Image 1 - identity must not drift. Do NOT copy any clothing, pose, or background from Image 1.
 - Image 2 is the PRODUCT REFERENCE. Use it as the EXACT reference for the bra: color, texture, fabric finish, silhouette, band width, strap width, and neckline shape. Replicate identically on the model's body. Do not alter the product in any way.`;
 
-  return `You are generating a professional fashion campaign image for TWEENS, a women's innerwear brand. The model is an adult woman.${realismBlock}
+  return `Photorealistic campaign photograph for TWEENS.${realismBlock}
 
 ${imageReferences}
 
-POSE & BODY DIRECTION:
-- Model stands facing forward, relaxed, friendly and confident posture, both arms visible at her sides.
-- Expression: soft, natural, warm smile.
-- Shot framed from shoulders to just below the bra band. Nothing below the waist.
-- Hair falls softly but directed AWAY from all bra straps, armhole edges, and bottom band. Zero hair overlap.
-- Skin completely tattoo-free and blemish-free, no jewellery unless already present in Image 1.
+SCENE: ${scene}
+
+SUBJECT & POSE: ${pose} Wearing the bra from the product reference as her clearly visible, unobstructed garment - it stays the clean, unbroken focal point of the shot. Arms relaxed and natural, no artificial push-up effect, moderate natural cup separation.
 
 PRODUCT VISIBILITY - CRITICAL NON-NEGOTIABLE:
-- The bra from Image 2 must be worn exactly - same color, fabric, fit, silhouette.
+- The bra must be worn exactly as shown in its reference image - same color, fabric, fit, silhouette.
 - ALL of the following fully visible, unobstructed, sharply in focus: full front center panel, both shoulder straps top to bottom, full bottom band left to right, both armhole edges.
-- Primary lighting on the bra - it is the HERO product. No hands, hair, or arms overlapping any part of it.
-
-BACKGROUND & LIGHTING:
-- Soft, airy, light-filled indoor background in warm white or soft ivory/cream tones. Subtle soft-focus background elements allowed. Lighting soft, diffused, natural, warm golden-white. No dark shadows, no cold tones, no dramatic contrast.
-- Tone must stay wholesome, tasteful, and commercial - no suggestive framing.
+- Primary lighting on the bra - it is the HERO product. No hands, hair, or fabric layers overlapping any part of it.
+- Skin tattoo-free and blemish-free, no jewellery unless already present in the model reference.
 
 CAMPAIGN THEME: "${theme}"
 
-INFOGRAPHIC LAYOUT & TYPOGRAPHY (bake this text directly into the image):
-HEADLINE - Position: top-left of image
-  Text: "${decision.headline}"
-  Font style: bold, modern, rounded sans-serif, large size
+TEXT OVERLAY (bake in as large, bold, headline-scale typography - a bold modern sans-serif, sized to command real visual presence, not a small caption):
+- Line 1 (HOOK) - upper-left third of frame, large and bold, sized to fit on ONE line across the frame width (reduce type size as needed rather than wrapping to two lines):
+  Text: "${decision.hook || decision.headline || ''}"
   Color: (${headlineColor})
-
-SUB-HEADING - Position: directly below headline
-  Text: "${decision.subheading}"
-  Font style: medium weight, modern sans-serif, slightly smaller than headline
+- Line 2 (PAYOFF) - directly beneath the hook, noticeably smaller but still bold and legible:
+  Text: "${decision.payoff || decision.subheading || ''}"
   Color: (${subColor})
-
-${decision.cta ? `CTA - Position: bottom-left corner
+${decision.cta ? `- CTA - bottom-left corner, small pill/button shape background:
   Text: "${decision.cta}"
-  Font style: bold, small pill/button shape background
   Color: (${headlineColor})` : ''}
+- Generous clear space around every text element. Text must NOT overlap the model's face or the bra.
+
+BRAND MARK: Bake in a small username-style handle wordmark "@tweens" - lowercase, clean modern sans-serif, evenly letter-spaced, colour (${headlineColor}), top-right corner, small and understated like a social-media handle, never competing with the hook text.
 
 OVERALL COMPOSITION:
-- Headline + sub-heading in the top-left quadrant. Model centered to center-right. Text must NOT overlap model's face or the bra.
-- Generous breathing space around all text elements. Final image balanced, airy, campaign-ready.
+- Text block in the upper-left third, model centered to center-right, brand handle top-right. Balanced, intentional, campaign-ready.
 - Aspect ratio: ${aspect}.
 
 TECHNICAL QUALITY:
-- Commercial fashion campaign quality, photorealistic, not illustrated, not stylised, sharp focus on the product.${hyperReal ? ' Shot on a Hasselblad medium-format camera, 80mm lens, professional studio lighting, with true human skin texture including visible pores - not smoothed or plastic.' : ''}
+- Commercial fashion campaign quality, photorealistic, editorial, not illustrated, not stylised, not staged or camera-aware. Sharp focus on the product and the model's eyes/face.
 
 NEGATIVE INSTRUCTIONS:
-${useDescriptionOnly ? '- Do NOT alter bra color, shape, texture, or silhouette from the product reference image' : `- Do NOT alter model's face, skin tone, hair color, or body from Image 1
-- Do NOT alter bra color, shape, texture, or silhouette from Image 2
-- Do NOT add tattoos, jewelry, piercings, or accessories not in Image 1`}
-- Do NOT let hair fall over bra straps, armhole edges, or bottom band
-- Do NOT use dark, moody, cold-toned, or suggestive backgrounds or lighting
-- Do NOT add watermarks, logos, or extra branding
+${useDescriptionOnly ? '- Do NOT alter bra color, shape, texture, or silhouette from the product reference image' : `- Do NOT let identity drift from the model reference image - face, skin tone, hair color, and body must match exactly
+- Do NOT alter bra color, shape, texture, or silhouette from its reference image
+- Do NOT add tattoos, jewelry, piercings, or accessories not already present in the model reference`}
+- Do NOT let hair or any fabric layer cover the bra straps, cups, or band
+- Do NOT add an artificial push-up effect
+- Do NOT place any sparkle, star, glint, or lens-flare artifact anywhere in the frame
+- Do NOT over-light or flatten the skin - keep pore-level texture visible under the polish
+- Do NOT use dark, moody, or exploitative framing - tasteful and editorial, never explicit
+- Do NOT add watermarks or extra logos beyond the "@tweens" handle
 - Do NOT generate multiple models or background figures
-- Render all quoted text exactly as written, no spelling changes, no added or duplicate words.`;
+- Do NOT misspell or alter the hook, payoff, CTA, or handle text - render exactly as written, no added or duplicate words.`;
 }
 
 async function requestGeminiImage(prompt, imageParts, apiKey) {
@@ -552,6 +568,7 @@ $('generateBtn').addEventListener('click', async () => {
   const aspect = $('aspect').value.trim() || '4:5 portrait';
   const hyperReal = $('hyperReal').checked;
   const aiModelOnly = $('aiModelOnly').checked;
+  const styleDirection = $('styleDirection').value.trim();
 
   if (themes.length === 0 && state.sheetRows.length > 0) {
     themes = themesFromSheetRows(state.sheetRows);
@@ -570,7 +587,7 @@ $('generateBtn').addEventListener('click', async () => {
     const card = addResultCard(theme, 'Choosing bra + model...');
     try {
       logLine(`[${theme}] asking AI to pick bra + model + copy...`);
-      const decision = await decideBraModelAndCopy(theme, state.braImages, state.modelImages, state.sheetRows, apiKey);
+      const decision = await decideBraModelAndCopy(theme, state.braImages, state.modelImages, state.sheetRows, styleDirection, apiKey);
       const bra = state.braImages[decision.braIndex];
       const model = state.modelImages[decision.modelIndex];
       logLine(`[${theme}] picked bra "${bra.name}" + model "${model.name}". Generating image...`);
