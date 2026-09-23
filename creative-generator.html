@@ -81,6 +81,10 @@
     <input type="password" id="apiKey" placeholder="AIza...">
     <div class="hint">Stored only in your browser (localStorage). Never uploaded anywhere else. Get one at aistudio.google.com/apikey.</div>
 
+    <label>Image model</label>
+    <input type="text" id="imageModel" placeholder="gemini-2.5-flash-image">
+    <div class="hint">Google's current native image model. If they release a newer/better one, type its exact model id here (see ai.google.dev/models) &mdash; no other changes needed. Leave as the default if unsure.</div>
+
     <label>Bra photos (upload all of them at once)</label>
     <div class="dropzone" id="braDrop">Click or drop bra product photos here</div>
     <input type="file" id="braFiles" class="file-input" accept="image/*" multiple>
@@ -150,11 +154,16 @@ Everyday comfort, no-elastic construction, feature callout"></textarea>
 
 <script>
 const state = { braImages: [], modelImages: [], sheetRows: [], aiPortraits: {} };
+const DEFAULT_IMAGE_MODEL = 'gemini-2.5-flash-image';
 
 const $ = id => document.getElementById(id);
 const apiKeyInput = $('apiKey');
 apiKeyInput.value = localStorage.getItem('tweens_gemini_key') || '';
 apiKeyInput.addEventListener('input', () => localStorage.setItem('tweens_gemini_key', apiKeyInput.value.trim()));
+
+const imageModelInput = $('imageModel');
+imageModelInput.value = localStorage.getItem('tweens_gemini_image_model') || DEFAULT_IMAGE_MODEL;
+imageModelInput.addEventListener('input', () => localStorage.setItem('tweens_gemini_image_model', imageModelInput.value.trim()));
 
 function logLine(msg) {
   const el = $('log');
@@ -267,20 +276,80 @@ async function loadSheet(file) {
 }
 
 const GEMINI_TEXT_MODEL = 'gemini-2.5-flash';
-const GEMINI_IMAGE_MODEL = 'gemini-2.5-flash-image';
 
-async function callGemini(model, contents, generationConfig, apiKey) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ contents, generationConfig })
-  });
-  const json = await res.json();
-  if (!res.ok) {
-    throw new Error(json.error?.message || `Gemini request failed (${res.status})`);
+function getImageModel() {
+  return imageModelInput.value.trim() || DEFAULT_IMAGE_MODEL;
+}
+
+function friendlyGeminiError(status, body) {
+  const apiMsg = body?.error?.message;
+  if (status === 400 && /API key not valid|API_KEY_INVALID/i.test(apiMsg || '')) {
+    return 'Your Gemini API key looks invalid. Double-check it at aistudio.google.com/apikey.';
   }
-  return json;
+  if (status === 401 || status === 403) {
+    return 'Gemini rejected this API key (unauthorized). Check the key is correct and has the Generative Language API enabled.';
+  }
+  if (status === 429) {
+    return 'Gemini rate limit hit (too many requests). This request was retried automatically but still failed - try again in a minute, or reduce how many themes you generate at once.';
+  }
+  if (status === 404 && /model/i.test(apiMsg || '')) {
+    return `The model name wasn't found by Gemini. If you changed the "Image model" field, check the exact model id at ai.google.dev/models.`;
+  }
+  if (status >= 500) {
+    return 'Gemini had a server-side error. This was retried automatically but still failed - try again shortly.';
+  }
+  return apiMsg || `Gemini request failed (HTTP ${status}).`;
+}
+
+async function callGemini(model, contents, generationConfig, apiKey, maxRetries = 3) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  let lastErr;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    let res;
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents, generationConfig })
+      });
+    } catch (networkErr) {
+      lastErr = new Error('Network error reaching Gemini - check your internet connection and try again.');
+      if (attempt < maxRetries) { await sleep(1000 * Math.pow(2, attempt)); continue; }
+      throw lastErr;
+    }
+
+    let body;
+    try {
+      body = await res.json();
+    } catch (parseErr) {
+      body = null;
+    }
+
+    if (res.ok) return body || {};
+
+    const retryable = res.status === 429 || res.status >= 500;
+    lastErr = new Error(friendlyGeminiError(res.status, body));
+    if (retryable && attempt < maxRetries) {
+      await sleep(1000 * Math.pow(2, attempt));
+      continue;
+    }
+    throw lastErr;
+  }
+  throw lastErr;
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function parseJsonLoose(text) {
+  const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+  try { return JSON.parse(cleaned); } catch (e) {}
+  const match = cleaned.match(/\{[\s\S]*\}/);
+  if (match) {
+    try { return JSON.parse(match[0]); } catch (e) {}
+  }
+  throw new Error('Could not parse AI response as JSON: ' + text.slice(0, 200));
 }
 
 async function classifyBulkImages(items, apiKey) {
@@ -304,8 +373,7 @@ Respond with ONLY strict JSON, no markdown: {"classifications": [{"index": numbe
   const json = await callGemini(GEMINI_TEXT_MODEL, [{ role: 'user', parts }],
     { responseMimeType: 'application/json' }, apiKey);
   const text = json.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('') || '{}';
-  let parsed;
-  try { parsed = JSON.parse(text); } catch (e) { throw new Error('Could not parse AI sort result: ' + text); }
+  const parsed = parseJsonLoose(text);
   return parsed.classifications || [];
 }
 
@@ -360,9 +428,11 @@ Respond with ONLY strict JSON, no markdown, matching this shape:
     { responseMimeType: 'application/json' }, apiKey);
 
   const text = json.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join('') || '{}';
-  let parsed;
-  try { parsed = JSON.parse(text); } catch (e) { throw new Error('Could not parse AI decision: ' + text); }
+  const parsed = parseJsonLoose(text);
 
+  if (braImages.length === 0 || modelImages.length === 0) {
+    throw new Error('No bra or model photos available to choose from.');
+  }
   parsed.braIndex = Math.min(Math.max(0, parsed.braIndex | 0), braImages.length - 1);
   parsed.modelIndex = Math.min(Math.max(0, parsed.modelIndex | 0), modelImages.length - 1);
   return parsed;
@@ -455,12 +525,14 @@ ${useDescriptionOnly ? '- Do NOT alter bra color, shape, texture, or silhouette 
 
 async function requestGeminiImage(prompt, imageParts, apiKey) {
   const parts = [{ text: prompt }, ...imageParts];
-  const json = await callGemini(GEMINI_IMAGE_MODEL, [{ role: 'user', parts }], {}, apiKey);
-  const imgPart = json.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+  const json = await callGemini(getImageModel(), [{ role: 'user', parts }], {}, apiKey);
+  const candidate = json.candidates?.[0];
+  const imgPart = candidate?.content?.parts?.find(p => p.inlineData);
   if (!imgPart) {
-    const textPart = json.candidates?.[0]?.content?.parts?.find(p => p.text);
-    const finishReason = json.candidates?.[0]?.finishReason || '';
-    throw new Error(`${finishReason || 'No image returned'}. ` + (textPart?.text || JSON.stringify(json).slice(0, 300)));
+    const textPart = candidate?.content?.parts?.find(p => p.text);
+    const finishReason = candidate?.finishReason || '';
+    const detail = textPart?.text || (candidate ? '' : 'The API returned no candidates - this usually means the request itself was rejected before generation started.');
+    throw new Error(`${finishReason || 'No image returned'}. ${detail}`.trim());
   }
   return `data:${imgPart.inlineData.mimeType};base64,${imgPart.inlineData.data}`;
 }
@@ -583,7 +655,9 @@ $('generateBtn').addEventListener('click', async () => {
   btn.disabled = true;
   $('log').textContent = `Starting ${themes.length} campaign(s)...`;
 
-  for (const theme of themes) {
+  for (let i = 0; i < themes.length; i++) {
+    const theme = themes[i];
+    if (i > 0) await sleep(500);
     const card = addResultCard(theme, 'Choosing bra + model...');
     try {
       logLine(`[${theme}] asking AI to pick bra + model + copy...`);
